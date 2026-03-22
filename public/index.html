@@ -11,6 +11,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/prop-types@15/prop-types.min.js"></script>
 <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <style>
 * {
 font-family: 'Inter', 'Noto Sans KR', sans-serif;
@@ -230,6 +231,218 @@ text-transform: uppercase;
 color: #94a3b8;
 margin-bottom: 0.5rem;
 }
+.step-indicator {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 2rem;
+position: relative;
+}
+.step-indicator::before {
+content: '';
+position: absolute;
+top: 20px;
+left: 0;
+right: 0;
+height: 2px;
+background-color: #e2e8f0;
+z-index: 0;
+}
+.step-circle {
+width: 40px;
+height: 40px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 600;
+font-size: 0.875rem;
+position: relative;
+z-index: 1;
+transition: all 0.3s ease;
+background-color: #e2e8f0;
+color: #94a3b8;
+}
+.step-circle.active {
+background: linear-gradient(135deg, #004ac6 0%, #2563eb 100%);
+color: white;
+box-shadow: 0 4px 12px rgba(0, 74, 198, 0.3);
+}
+.step-circle.completed {
+background-color: #006243;
+color: white;
+}
+.step-label {
+font-size: 0.75rem;
+font-weight: 600;
+color: #94a3b8;
+margin-top: 0.75rem;
+text-align: center;
+}
+.step-label.active {
+color: #004ac6;
+}
+.drop-zone {
+border: 2px dashed #004ac6;
+border-radius: 0.75rem;
+padding: 2rem;
+text-align: center;
+cursor: pointer;
+transition: all 0.2s;
+background-color: #f0f6ff;
+}
+.drop-zone:hover,
+.drop-zone.dragover {
+background-color: #e0effe;
+border-color: #2563eb;
+}
+.drop-zone-icon {
+width: 48px;
+height: 48px;
+margin: 0 auto 1rem;
+color: #004ac6;
+}
+.file-list {
+background: white;
+border-radius: 0.75rem;
+padding: 1.25rem;
+margin-top: 1rem;
+}
+.file-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 0.75rem;
+border-bottom: 1px solid #e2e8f0;
+font-size: 0.875rem;
+}
+.file-item:last-child {
+border-bottom: none;
+}
+.before-after {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1.5rem;
+}
+.before-after-card {
+background: white;
+border-radius: 0.75rem;
+padding: 1.5rem;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.before-after-title {
+font-size: 0.875rem;
+font-weight: 600;
+color: #64748b;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+margin-bottom: 1rem;
+}
+.cleaning-rule {
+background: white;
+border-radius: 0.75rem;
+padding: 1.25rem;
+margin-bottom: 1rem;
+border-left: 4px solid #004ac6;
+display: flex;
+align-items: center;
+gap: 1rem;
+}
+.cleaning-rule.applied {
+border-left-color: #006243;
+}
+.rule-toggle {
+width: 48px;
+height: 28px;
+border-radius: 9999px;
+background-color: #e2e8f0;
+border: none;
+cursor: pointer;
+transition: background-color 0.3s;
+position: relative;
+padding: 0;
+}
+.rule-toggle.active {
+background-color: #006243;
+}
+.rule-toggle::after {
+content: '';
+position: absolute;
+width: 24px;
+height: 24px;
+border-radius: 50%;
+background-color: white;
+top: 2px;
+left: 2px;
+transition: left 0.3s;
+}
+.rule-toggle.active::after {
+left: 22px;
+}
+.rule-info {
+flex: 1;
+}
+.rule-name {
+font-weight: 600;
+color: #191c1e;
+margin-bottom: 0.25rem;
+}
+.rule-description {
+font-size: 0.875rem;
+color: #64748b;
+}
+.rule-count {
+font-size: 0.875rem;
+font-weight: 600;
+color: #004ac6;
+}
+.summary-stat {
+background: white;
+border-radius: 0.75rem;
+padding: 1.25rem;
+text-align: center;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.summary-stat-value {
+font-size: 1.875rem;
+font-weight: 700;
+color: #191c1e;
+margin: 0.5rem 0;
+}
+.summary-stat-label {
+font-size: 0.875rem;
+color: #94a3b8;
+font-weight: 500;
+}
+.success-animation {
+animation: successPulse 0.6s ease-out;
+}
+@keyframes successPulse {
+0% {
+transform: scale(0.8);
+opacity: 0;
+}
+50% {
+transform: scale(1.05);
+}
+100% {
+transform: scale(1);
+opacity: 1;
+}
+}
+.step-content {
+animation: contentFadeIn 0.3s ease-in-out;
+}
+@keyframes contentFadeIn {
+from {
+opacity: 0;
+transform: translateY(10px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
 </style>
 </head>
 <body>
@@ -237,6 +450,7 @@ margin-bottom: 0.5rem;
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
 const { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } = window.Recharts;
+
 // SVG Icons
 const IconHome = () => (
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -378,6 +592,14 @@ const IconArrowDown = () => (
 <polyline points="19 12 12 19 5 12"></polyline>
 </svg>
 );
+const IconUpload = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+<polyline points="17 8 12 3 7 8"></polyline>
+<line x1="12" y1="3" x2="12" y2="15"></line>
+</svg>
+);
+
 // Header Component
 const Header = ({ currentPage }) => {
 const pageLabels = {
@@ -390,7 +612,8 @@ const pageLabels = {
 'cashflow': 'CASH FLOW',
 'quality': 'DATA QUALITY',
 'journal': 'JOURNAL ENTRIES',
-'settlement': 'SETTLEMENT'
+'settlement': 'SETTLEMENT',
+'pipeline': 'DATA PIPELINE'
 };
 const pageTitles = {
 'home': 'CEO Insight Board',
@@ -402,7 +625,8 @@ const pageTitles = {
 'cashflow': '현금흐름 예측',
 'quality': '데이터 품질 모니터',
 'journal': '분개 전표',
-'settlement': '정산 단계별 상세'
+'settlement': '정산 단계별 상세',
+'pipeline': '파이프라인 마법사'
 };
 return (
 <div className="fixed top-0 right-0 left-64 h-16 glass-header border-b border-slate-200 flex items-center justify-between px-8 z-40">
@@ -433,6 +657,7 @@ className="pl-10 pr-4 py-2 rounded-full bg-slate-100 text-sm focus:outline-none 
 </div>
 );
 };
+
 // Sidebar Component
 const Sidebar = ({ currentPage, setCurrentPage }) => {
 const navItems = [
@@ -442,7 +667,8 @@ const navItems = [
 { id: 'settlement', label: 'SETTLEMENT', icon: IconReceipt },
 { id: 'approvals', label: 'CONTROL', icon: IconShield },
 { id: 'theater', label: 'ANALYSIS', icon: IconBarChart },
-{ id: 'quality', label: 'SYSTEM', icon: IconSettings }
+{ id: 'quality', label: 'SYSTEM', icon: IconSettings },
+{ id: 'pipeline', label: 'PIPELINE', icon: IconUpload }
 ];
 return (
 <div className="fixed left-0 top-0 w-64 h-screen sidebar-bg border-r border-slate-200 pt-8 pb-8 flex flex-col z-50">
@@ -459,7 +685,10 @@ const Icon = item.icon;
 return (
 <button
 key={item.id}
-onClick={() => setCurrentPage(item.id)}
+onClick={() => {
+setCurrentPage(item.id);
+window.location.hash = item.id;
+}}
 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
 currentPage === item.id
 ? 'active-nav'
@@ -490,6 +719,7 @@ Logout
 </div>
 );
 };
+
 // Page: CEO Insight Board
 const CEOInsightBoard = () => {
 const metrics = [
@@ -568,7 +798,7 @@ return (
 <div className="space-y-3">
 <div className="insight-card blue">
 <p className="insight-title">Projects</p>
-<p className="insight-content">강남 지역 이상 직후 감지됨</p>
+<p className="insight-content">강남 지역 이상 집후 감지됨</p>
 </div>
 <div className="insight-card green">
 <p className="insight-title">Areas</p>
@@ -589,15 +819,17 @@ return (
 </div>
 );
 };
+
 // Page: Operations Dashboard
-const OperationsDashboard = () => {
+const OperationsDashboard = ({ pipelineData }) => {
 const metrics = [
 { label: 'Total AR', value: '$4,281,902', change: '+12.4%', positive: true },
 { label: 'Gross Revenue', value: '$12,940,551', change: '+8.1%', positive: true },
 { label: 'Active Theater Count', value: '842', change: 'Stable', positive: true },
 { label: 'Detected Anomalies', value: '24', change: '-3', positive: true }
 ];
-const revenueData = [
+
+const baseRevenueData = [
 { month: 'Jan', 'Gross Revenue': 8900000, 'AR': 3200000 },
 { month: 'Feb', 'Gross Revenue': 9200000, 'AR': 3400000 },
 { month: 'Mar', 'Gross Revenue': 8800000, 'AR': 3100000 },
@@ -606,7 +838,16 @@ const revenueData = [
 { month: 'Jun', 'Gross Revenue': 12300000, 'AR': 4500000 },
 { month: 'Jul', 'Gross Revenue': 12940551, 'AR': 4681902 }
 ];
-const pipelineData = [
+
+const revenueData = pipelineData && pipelineData.length > 0
+? [...baseRevenueData, ...pipelineData.map(row => ({
+  month: `New-${Math.random().toString(36).substr(2, 5)}`,
+  'Gross Revenue': row.revenue || 0,
+  'AR': (row.revenue || 0) * 0.35
+}))]
+: baseRevenueData;
+
+const pipelineMetrics = [
 { name: 'Verification', percentage: 82 },
 { name: 'Approval Queue', percentage: 45 },
 { name: 'Final Settlement', percentage: 61 }
@@ -651,7 +892,7 @@ return (
 <p className="section-label">Pipeline</p>
 <p className="section-title">Settlement Pipeline</p>
 <div className="space-y-4 mb-4">
-{pipelineData.map((p, i) => (
+{pipelineMetrics.map((p, i) => (
 <div key={i}>
 <div className="flex justify-between mb-2">
 <span className="text-sm font-medium text-slate-700">{p.name}</span>
@@ -707,6 +948,7 @@ return (
 </div>
 );
 };
+
 // Page: Contracts
 const ContractsMaster = () => {
 const metrics = [
@@ -789,6 +1031,7 @@ return (
 </div>
 );
 };
+
 // Page: Approvals
 const ApprovalCenter = () => {
 const metrics = [
@@ -797,10 +1040,10 @@ const metrics = [
 { label: '승인 거절', value: '08건', change: 'Requires review', positive: false }
 ];
 const approvalItems = [
-{ id: 'APR-001', theater: 'CGV 청담씤너시티', content: '10월 상영 정산', amount: '₩12,450,000', status: 'PENDING', date: '2024.03.20' },
+{ id: 'APR-001', theater: 'CGV 청담씨네시티', content: '10월 상영 정산', amount: '₩12,450,000', status: 'PENDING', date: '2024.03.20' },
 { id: 'APR-002', theater: '메가박스 코엑스 스토어', content: '정산 건', amount: '₩8,920,000', status: 'PENDING', date: '2024.03.19' },
 { id: 'APR-003', theater: '롯데시네마 월드타워', content: '제휴 정산', amount: '₩45,100,000', status: 'APPROVED', date: '2024.03.18' },
-{ id: 'APR-004', theater: '시네마 파크', content: 'AR 렌퓰 정산', amount: '₩1,200,000', status: 'REJECTED', date: '2024.03.17' }
+{ id: 'APR-004', theater: '시네마 팈크', content: 'AR 렌탈 정산', amount: '₩1,200,000', status: 'REJECTED', date: '2024.03.17' }
 ];
 const [filterTab, setFilterTab] = useState('all');
 return (
@@ -856,34 +1099,22 @@ filterTab === tab
 </div>
 );
 };
-// Page: Anomalies
+
+// Page: Anomaly Detection
 const AnomalyDetection = () => {
 const metrics = [
-{ label: 'Total Anomalies', value: '1,284', change: '+12%', positive: true },
-{ label: 'Critical Alerts', value: '42', change: '', positive: true },
-{ label: 'Warnings', value: '156', change: '', positive: false },
-{ label: 'Information', value: '1,086', change: '', positive: true }
+{ label: '감지된 이상', value: '42', change: '+5', positive: false },
+{ label: '확인된 실제 이상', value: '17', change: '-2', positive: true },
+{ label: '자동 수정율', value: '71.4%', change: '+8.2%', positive: true }
 ];
-const severityData = [
-{ name: 'Critical', value: 180, fill: '#ba1a1a' },
-{ name: 'Warning', value: 300, fill: '#ca8a04' },
-{ name: 'Info', value: 720, fill: '#2563eb' }
-];
-const typeData = [
-{ name: 'AUTH', value: 280 },
-{ name: 'NETWORK', value: 350 },
-{ name: 'PAYMENT', value: 200 },
-{ name: 'USER', value: 180 },
-{ name: 'API', value: 170 }
-];
-const alertFeed = [
-{ id: 'ANM-001', timestamp: '2024.03.20 14:32', anomaly: 'Unusual settlement pattern', severity: 'Critical', entity: 'CGV Gangnam', action: 'Review' },
-{ id: 'ANM-002', timestamp: '2024.03.20 13:15', anomaly: 'Network latency spike', severity: 'Warning', entity: 'API Gateway', action: 'Monitor' },
-{ id: 'ANM-003', timestamp: '2024.03.20 12:44', anomaly: 'High transaction volume', severity: 'Info', entity: 'Settlement System', action: 'Log' }
+const anomalies = [
+{ id: 1, type: 'Revenue Spike', theater: 'CGV 강남', severity: 'HIGH', description: '예상 대비 120% 초과 수익' },
+{ id: 2, type: 'Low Audience', theater: 'Lotte Cinema 월득타워', severity: 'MEDIUM', description: '관객수 50% 미만' },
+{ id: 3, type: 'Date Mismatch', theater: 'Megabox 코엑스', severity: 'LOW', description: '날짜 형식 불일치' }
 ];
 return (
 <div className="page-fade-in space-y-6">
-<div className="grid grid-cols-4 gap-6">
+<div className="grid grid-cols-3 gap-6">
 {metrics.map((m, i) => (
 <div key={i} className="metric-card">
 <p className="metric-label">{m.label}</p>
@@ -894,456 +1125,173 @@ return (
 </div>
 ))}
 </div>
-<div className="grid grid-cols-2 gap-6">
 <div className="chart-container">
-<p className="section-label">Distribution</p>
-<p className="section-title">Severity Ratio</p>
-<ResponsiveContainer width="100%" height={250}>
-<PieChart>
-<Pie
-data={severityData}
-cx="50%"
-cy="50%"
-innerRadius={60}
-outerRadius={100}
-paddingAngle={2}
-dataKey="value"
->
-{severityData.map((entry, index) => (
-<Cell key={`cell-${index}`} fill={entry.fill} />
+<p className="section-title mb-4">감지된 이상 집후</p>
+<div className="space-y-3">
+{anomalies.map((a) => (
+<div key={a.id} className="flex items-center gap-4 p-4 border border-slate-200 rounded-lg">
+<div className={`flex-shrink-0 p-2 rounded-lg ${a.severity === 'HIGH' ? 'bg-red-100' : a.severity === 'MEDIUM' ? 'bg-yellow-100' : 'bg-blue-100'}`}>
+<IconAlertTriangle className={a.severity === 'HIGH' ? 'text-red-600' : a.severity === 'MEDIUM' ? 'text-yellow-600' : 'text-blue-600'} />
+</div>
+<div className="flex-1">
+<p className="font-semibold text-slate-900">{a.type}</p>
+<p className="text-sm text-slate-600">{a.theater} - {a.description}</p>
+</div>
+<span className={`chip ${a.severity === 'HIGH' ? 'red' : a.severity === 'MEDIUM' ? 'yellow' : 'blue'}`}>
+{a.severity}
+</span>
+</div>
 ))}
-</Pie>
-<Tooltip />
-</PieChart>
-</ResponsiveContainer>
-<div className="text-center mt-4">
-<p className="text-3xl font-bold text-slate-900">1.2k</p>
-<p className="text-xs text-slate-600 mt-1">Total Anomalies</p>
 </div>
+</div>
+</div>
+);
+};
+
+// Page: Theater Performance
+const TheaterPerformance = () => {
+const metrics = [
+{ label: 'Top Theater', value: 'CGV Gangnam', change: '₩4.25M', positive: true },
+{ label: 'Avg Performance', value: '₩1.87M', change: '+3.2%', positive: true },
+{ label: 'Growth Rate', value: '+12.8%', change: 'YoY', positive: true }
+];
+const theaterData = [
+{ name: 'CGV Gangnam', revenue: 4250000, audience: 12400 },
+{ name: 'Lotte Cinema Busan', revenue: 2120000, audience: 8900 },
+{ name: 'Megabox COEX', revenue: 1890000, audience: 7200 }
+];
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-3 gap-6">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value text-base">{m.value}</p>
+<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
+{m.change}
+</p>
+</div>
+))}
 </div>
 <div className="chart-container">
-<p className="section-label">Classification</p>
-<p className="section-title">Type Distribution</p>
-<ResponsiveContainer width="100%" height={250}>
-<BarChart data={typeData}>
+<p className="section-title">극장별 매출 추세</p>
+<ResponsiveContainer width="100%" height={300}>
+<BarChart data={theaterData}>
 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
 <XAxis dataKey="name" stroke="#94a3b8" />
 <YAxis stroke="#94a3b8" />
 <Tooltip />
-<Bar dataKey="value" fill="#004ac6" radius={[8, 8, 0, 0]} />
+<Legend />
+<Bar dataKey="revenue" fill="#004ac6" />
+<Bar dataKey="audience" fill="#ba1a1a" />
 </BarChart>
 </ResponsiveContainer>
 </div>
 </div>
-<div className="table-container">
-<table className="w-full">
-<thead className="table-header">
-<tr>
-<th>Timestamp</th>
-<th>Anomaly ID</th>
-<th>Description</th>
-<th>Severity</th>
-<th>Entity</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody>
-{alertFeed.map((alert) => (
-<tr key={alert.id} className="table-row">
-<td className="table-cell text-xs text-slate-600">{alert.timestamp}</td>
-<td className="table-cell font-mono text-xs text-blue-600">{alert.id}</td>
-<td className="table-cell text-sm text-slate-900 font-medium">{alert.anomaly}</td>
-<td className="table-cell">
-<span className={`chip ${alert.severity === 'Critical' ? 'red' : alert.severity === 'Warning' ? 'yellow' : 'blue'}`}>
-{alert.severity}
-</span>
-</td>
-<td className="table-cell text-sm text-slate-600">{alert.entity}</td>
-<td className="table-cell text-sm text-blue-600 font-medium cursor-pointer hover:underline">{alert.action}</td>
-</tr>
-))}
-</tbody>
-</table>
-</div>
-</div>
 );
 };
-// Page: Theater Performance
-const TheaterPerformance = () => {
-const growthData = [
-{ theater: 'CGV 강남', growth: '+12.4%' },
-{ theater: '롯데시네마 월드타워', growth: '+8.9%' },
-{ theater: '메가박스 코엑스', growth: '+5.2%' },
-{ theater: 'CGV 용산아이팈크몰', growth: '-2.1%' }
-];
-const radarData = [
-{ metric: 'Revenue', value: 85 },
-{ metric: 'Efficiency', value: 92 },
-{ metric: 'Occupancy', value: 64 },
-{ metric: 'Growth', value: 78 },
-{ metric: 'Compliance', value: 88 }
-];
-const keyPerformance = [
-{ label: 'Net Revenue', value: '₩142,850,000' },
-{ label: 'Settlement Efficiency', value: '99.4%' },
-{ label: 'Seat Occupancy', value: '64.2%' }
-];
-const regionBreakdown = [
-{ region: '서울 강남권', percentage: 42.5 },
-{ region: '서울 강서권', percentage: 18.2 },
-{ region: '경기 북부', percentage: 12.1 }
-];
-return (
-<div className="page-fade-in space-y-6">
-<div className="grid grid-cols-2 gap-6">
-<div className="chart-container">
-<p className="section-label">Ranking</p>
-<p className="section-title">Growth Ranking</p>
-<div className="space-y-3">
-{growthData.map((g, i) => (
-<div key={i} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded transition">
-<div>
-<p className="text-sm font-medium text-slate-900">{g.theater}</p>
-<p className="text-xs text-slate-500 mt-1">YoY Growth</p>
-</div>
-<span className={`text-sm font-bold ${g.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-{g.growth}
-</span>
-</div>
-))}
-</div>
-</div>
-<div className="chart-container">
-<p className="section-label">Analysis</p>
-<p className="section-title">Multi-Dimensional</p>
-<ResponsiveContainer width="100%" height={250}>
-<RadarChart data={radarData}>
-<PolarGrid stroke="#e2e8f0" />
-<PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
-<PolarRadiusAxis angle={90} domain={[0, 100]} />
-<Radar name="Performance" dataKey="value" stroke="#004ac6" fill="#004ac6" fillOpacity={0.6} />
-<Tooltip />
-</RadarChart>
-</ResponsiveContainer>
-</div>
-</div>
-<div className="grid grid-cols-2 gap-6">
-<div className="chart-container">
-<p className="section-label">Metrics</p>
-<p className="section-title">Key Performance</p>
-<div className="space-y-4">
-{keyPerformance.map((kp, i) => (
-<div key={i} className="flex justify-between items-center">
-<span className="text-sm text-slate-600">{kp.label}</span>
-<span className="text-lg font-bold text-slate-900">{kp.value}</span>
-</div>
-))}
-</div>
-</div>
-<div className="chart-container bg-gradient-to-br from-blue-50 to-blue-100">
-<p className="section-label text-blue-600">Market Insights</p>
-<p className="section-title text-blue-900">이상 직후</p>
-<p className="text-sm text-blue-800 mt-4">주말 관객수가 작년 동기 대비 15.8% 증가</p>
-</div>
-</div>
-<div className="chart-container">
-<p className="section-label">Regional</p>
-<p className="section-title">지역별 매출 비중</p>
-<div className="space-y-4">
-{regionBreakdown.map((r, i) => (
-<div key={i}>
-<div className="flex justify-between mb-2">
-<span className="text-sm font-medium text-slate-700">{r.region}</span>
-<span className="text-sm font-bold text-blue-600">{r.percentage}%</span>
-</div>
-<div className="progress-bar">
-<div className="progress-fill" style={{ width: `${r.percentage}%` }}></div>
-</div>
-</div>
-))}
-</div>
-<div className="mt-4 p-3 bg-slate-50 rounded text-xs text-slate-600">
-<p className="font-semibold text-slate-900 mb-1">분석 알고리즘 상태</p>
-<p>Stable • Deep Learning Engine v4.2 active</p>
-</div>
-</div>
-</div>
-);
-};
+
 // Page: Cash Flow Forecast
 const CashFlowForecast = () => {
 const metrics = [
-{ label: 'AR Balance', value: '₩14.2B', change: '+2.4%', positive: true },
-{ label: 'Expected Recovery', value: '₩12.8B', change: '90.1%', positive: true },
-{ label: 'Long-Term Risk', value: '₩1.4B', change: 'Critical', positive: false },
-{ label: 'Recovery Rate', value: '88.4%', change: '-0.2%', positive: false }
+{ label: 'Current Balance', value: '₩12.5B', change: '+5.2%', positive: true },
+{ label: 'Projected Inflow', value: '₩8.3B', change: 'Next 30 days', positive: true },
+{ label: 'Risk Level', value: 'LOW', change: '', positive: true }
 ];
-const waterData = [
-{ month: 'Jan', 'Opening': 12000000, 'Inflow': 3200000, 'Outflow': -1200000, 'Closing': 14000000 },
-{ month: 'Feb', 'Opening': 14000000, 'Inflow': 2800000, 'Outflow': -1100000, 'Closing': 15700000 },
-{ month: 'Mar', 'Opening': 15700000, 'Inflow': 3400000, 'Outflow': -1300000, 'Closing': 17800000 },
-{ month: 'Apr', 'Opening': 17800000, 'Inflow': 2900000, 'Outflow': -950000, 'Closing': 19750000 },
-{ month: 'May', 'Opening': 19750000, 'Inflow': 3100000, 'Outflow': -1050000, 'Closing': 21800000 },
-{ month: 'Jun', 'Opening': 21800000, 'Inflow': 3500000, 'Outflow': -1200000, 'Closing': 24100000 }
-];
-const riskData = [
-{ risk: 'Low Risk', percentage: 72 },
-{ risk: 'Medium Risk', percentage: 19 },
-{ risk: 'High Risk', percentage: 9 }
-];
-const arAgingData = [
-{ theater: 'CGV Megaplex Seoul', amount: '₩4,250M', riskLevel: 'SAFE' },
-{ theater: 'Lotte Cinema Busan', amount: '₩2,120M', riskLevel: 'MODERATE' },
-{ theater: 'Megabox COEX', amount: '₩1,890M', riskLevel: 'HIGH RISK' },
-{ theater: 'Indie Cinema Network', amount: '₩430M', riskLevel: 'CRITICAL' }
+const forecastData = [
+{ month: 'Jan', inflow: 5200000, outflow: 3100000 },
+{ month: 'Feb', inflow: 5900000, outflow: 3400000 },
+{ month: 'Mar', inflow: 6100000, outflow: 3200000 },
+{ month: 'Apr', inflow: 7200000, outflow: 3800000 },
+{ month: 'May', inflow: 8100000, outflow: 4200000 }
 ];
 return (
 <div className="page-fade-in space-y-6">
-<div className="grid grid-cols-4 gap-6">
+<div className="grid grid-cols-3 gap-6">
 {metrics.map((m, i) => (
 <div key={i} className="metric-card">
 <p className="metric-label">{m.label}</p>
-<p className="metric-value">{m.value}</p>
-<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
-{m.change}
-</p>
+<p className="metric-value text-base">{m.value}</p>
+{m.change && <p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>{m.change}</p>}
 </div>
 ))}
 </div>
 <div className="chart-container">
-<p className="section-label">Projection</p>
-<p className="section-title">Monthly Cash Flow Waterfall</p>
+<p className="section-title">현금 흐름 예측</p>
 <ResponsiveContainer width="100%" height={300}>
-<BarChart data={waterData}>
+<AreaChart data={forecastData}>
 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
 <XAxis dataKey="month" stroke="#94a3b8" />
 <YAxis stroke="#94a3b8" />
 <Tooltip />
 <Legend />
-<Bar dataKey="Inflow" stackId="a" fill="#16a34a" />
-<Bar dataKey="Outflow" stackId="a" fill="#ba1a1a" />
-<Bar dataKey="Closing" fill="#004ac6" />
-</BarChart>
+<Area type="monotone" dataKey="inflow" fill="#004ac6" stroke="#004ac6" fillOpacity={0.3} />
+<Area type="monotone" dataKey="outflow" fill="#ba1a1a" stroke="#ba1a1a" fillOpacity={0.3} />
+</AreaChart>
 </ResponsiveContainer>
-</div>
-<div className="grid grid-cols-3 gap-6">
-<div className="chart-container">
-<p className="section-label">Forecast</p>
-<p className="section-title">Recovery Projection</p>
-<div className="bg-slate-50 rounded p-4 space-y-2">
-<div className="flex justify-between">
-<span className="text-sm text-slate-600">Projected Inflow</span>
-<span className="font-bold text-slate-900">₩3.8B</span>
-</div>
-<div className="border-t border-slate-200 pt-2 mt-2">
-<div className="flex justify-between text-xs mb-1">
-<span className="text-slate-600">Within 30D</span>
-<span className="font-semibold text-slate-900">₩2.9B</span>
-</div>
-<div className="flex justify-between text-xs">
-<span className="text-slate-600">31-60D</span>
-<span className="font-semibold text-slate-900">₩0.7B</span>
-</div>
-</div>
-</div>
-</div>
-<div className="col-span-2">
-<div className="chart-container">
-<p className="section-label">Risk Distribution</p>
-<p className="section-title">Risk Analysis</p>
-<div className="space-y-3">
-{riskData.map((r, i) => (
-<div key={i}>
-<div className="flex justify-between mb-2">
-<span className="text-sm font-medium text-slate-700">{r.risk}</span>
-<span className="text-sm font-bold text-slate-900">{r.percentage}%</span>
-</div>
-<div className="progress-bar">
-<div
-className="progress-fill"
-style={{
-width: `${r.percentage}%`,
-background: r.risk === 'Low Risk' ? '#16a34a' : r.risk === 'Medium Risk' ? '#ca8a04' : '#ba1a1a'
-}}
-></div>
-</div>
-</div>
-))}
-</div>
-</div>
-</div>
-</div>
-<div className="table-container">
-<table className="w-full">
-<thead className="table-header">
-<tr>
-<th>Theater</th>
-<th>Amount</th>
-<th>Risk Level</th>
-</tr>
-</thead>
-<tbody>
-{arAgingData.map((ar) => (
-<tr key={ar.theater} className="table-row">
-<td className="table-cell text-sm font-medium text-slate-900">{ar.theater}</td>
-<td className="table-cell text-sm font-bold text-slate-900">{ar.amount}</td>
-<td className="table-cell">
-<span className={`chip ${ar.riskLevel === 'SAFE' ? 'green' : ar.riskLevel === 'MODERATE' ? 'blue' : ar.riskLevel === 'HIGH RISK' ? 'yellow' : 'red'}`}>
-{ar.riskLevel}
-</span>
-</td>
-</tr>
-))}
-</tbody>
-</table>
 </div>
 </div>
 );
 };
+
 // Page: Data Quality
 const DataQuality = () => {
 const metrics = [
-{ label: 'Quality Score', value: '98.4', change: '+1.2%', positive: true },
-{ label: 'Completeness', value: '99.1%', change: '', positive: true },
-{ label: 'Accuracy', value: '97.8%', change: '-0.4%', positive: false },
-{ label: 'Timeliness', value: '0.8h', change: '', positive: true }
+{ label: 'Data Quality Score', value: '98.4%', change: '+0.8%', positive: true },
+{ label: 'Data Completeness', value: '99.2%', change: '+1.2%', positive: true },
+{ label: 'Anomaly Rate', value: '0.2%', change: '-0.1%', positive: true }
 ];
-const qualityMatrix = [
-{ theater: 'CGV Gangnam', score: 98.2, status: 'OPTIMAL' },
-{ theater: 'Lotte World Tower', score: 82.5, status: 'REVIEW' },
-{ theater: 'Megabox COEX', score: 99.8, status: 'OPTIMAL' },
-{ theater: 'CGV Suwon', score: 95.1, status: 'OPTIMAL' }
+const qualityData = [
+{ category: 'Completeness', score: 99.2 },
+{ category: 'Consistency', score: 97.8 },
+{ category: 'Accuracy', score: 98.4 },
+{ category: 'Validity', score: 96.9 }
 ];
-const heatmapData = Array.from({ length: 7 }, (_, dayIdx) => ({
-day: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dayIdx],
-values: Array.from({ length: 7 }, () => Math.random() > 0.2 ? 'green' : 'red')
-}));
 return (
 <div className="page-fade-in space-y-6">
-<div className="grid grid-cols-4 gap-6">
+<div className="grid grid-cols-3 gap-6">
 {metrics.map((m, i) => (
 <div key={i} className="metric-card">
 <p className="metric-label">{m.label}</p>
-<p className="metric-value">{m.value}</p>
+<p className="metric-value text-base">{m.value}</p>
 <p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
 {m.change}
 </p>
 </div>
 ))}
 </div>
-<div className="table-container">
-<table className="w-full">
-<thead className="table-header">
-<tr>
-<th>Theater</th>
-<th>Quality Score</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-{qualityMatrix.map((q) => (
-<tr key={q.theater} className="table-row">
-<td className="table-cell text-sm font-medium text-slate-900">{q.theater}</td>
-<td className="table-cell">
-<div className="flex items-center gap-2">
-<span className="text-sm font-bold text-slate-900">{q.score}%</span>
-<div className="progress-bar" style={{ width: '100px' }}>
-<div className="progress-fill" style={{ width: `${q.score}%` }}></div>
-</div>
-</div>
-</td>
-<td className="table-cell">
-<span className={`chip ${q.status === 'OPTIMAL' ? 'green' : 'yellow'}`}>
-{q.status}
-</span>
-</td>
-</tr>
-))}
-</tbody>
-</table>
-</div>
-<div className="grid grid-cols-2 gap-6">
 <div className="chart-container">
-<p className="section-label">Heatmap</p>
-<p className="section-title">Data Gaps (7 days × 7 theaters)</p>
-<div className="grid gap-1">
-{heatmapData.map((row) => (
-<div key={row.day} className="flex gap-1 items-center">
-<span className="text-xs font-medium text-slate-500 w-8">{row.day}</span>
-<div className="flex gap-1 flex-1">
-{row.values.map((val, idx) => (
-<div
-key={idx}
-className="w-6 h-6 rounded text-xs flex items-center justify-center text-white font-bold"
-style={{ background: val === 'green' ? '#16a34a' : '#ba1a1a' }}
-></div>
-))}
-</div>
-</div>
-))}
-</div>
-</div>
-<div className="chart-container bg-gradient-to-br from-slate-800 to-slate-900 text-white">
-<p className="section-label text-slate-400">System</p>
-<p className="section-title text-white">Health Status</p>
-<div className="mt-4 space-y-3">
-<div className="flex items-center gap-2">
-<div className="w-2 h-2 bg-green-400 rounded-full"></div>
-<p className="text-sm">Sync engine is running optimally</p>
-</div>
-<div className="flex items-center gap-2">
-<div className="w-2 h-2 bg-green-400 rounded-full"></div>
-<p className="text-sm">All data feeds operational</p>
-</div>
-<div className="flex items-center gap-2">
-<div className="w-2 h-2 bg-green-400 rounded-full"></div>
-<p className="text-sm">Quality checks: PASSING</p>
-</div>
-</div>
-</div>
+<p className="section-title">데이터 품질 지표</p>
+<ResponsiveContainer width="100%" height={300}>
+<BarChart data={qualityData}>
+<CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+<XAxis dataKey="category" stroke="#94a3b8" />
+<YAxis stroke="#94a3b8" />
+<Tooltip />
+<Bar dataKey="score" fill="#004ac6" />
+</BarChart>
+</ResponsiveContainer>
 </div>
 </div>
 );
 };
+
 // Page: Journal Entries
 const JournalEntries = () => {
 const metrics = [
-{ label: 'Total Settlement Value', value: '₩4,285,190,000', change: '+12.4%', positive: true },
-{ label: 'Balance Status', value: 'Balanced ✓', change: '', positive: true },
-{ label: 'Total DR', value: '₩2,142,595,000', change: '', positive: true },
-{ label: 'Total CR', value: '₩2,142,595,000', change: '', positive: true }
+{ label: 'Total Entries', value: '12,580', change: '+340', positive: true },
+{ label: 'Verified', value: '12,451', change: '98.9%', positive: true },
+{ label: 'Pending Review', value: '129', change: '', positive: false }
+];
+const journalData = [
+{ id: 'JNL-001', theater: 'CGV 강남', amount: '₩2,450,000', status: 'VERIFIED' },
+{ id: 'JNL-002', theater: 'Lotte Cinema 월드타워', amount: '₩5,100,000', status: 'VERIFIED' },
+{ id: 'JNL-003', theater: 'Megabox 코엑스', amount: '₩1,890,000', status: 'PENDING' }
 ];
 const [expandedJournal, setExpandedJournal] = useState(null);
-const journalData = [
-{
-id: 'JNL-001',
-theater: 'CGV Gangnam Square',
-amount: '₩145,200,000',
-status: 'VERIFIED',
-details: [
-{ account: 'Cash & Equivalents 1001-01', dr: '145,200,000', cr: '' },
-{ account: 'Ticket Sales Revenue 4001-01', dr: '', cr: '120,000,000' },
-{ account: 'Concession Revenue 4002-01', dr: '', cr: '25,200,000' }
-]
-},
-{
-id: 'JNL-002',
-theater: 'Megabox COEX',
-amount: '₩312,850,000',
-status: 'VERIFIED',
-details: []
-},
-{
-id: 'JNL-003',
-theater: 'Lotte Cinema World Tower',
-amount: '₩289,140,000',
-status: 'VERIFIED',
-details: []
-}
-];
 return (
 <div className="page-fade-in space-y-6">
-<div className="grid grid-cols-4 gap-6">
+<div className="grid grid-cols-3 gap-6">
 {metrics.map((m, i) => (
 <div key={i} className="metric-card">
 <p className="metric-label">{m.label}</p>
@@ -1378,43 +1326,15 @@ return (
 <span className="chip green">{j.status}</span>
 </td>
 </tr>
-{expandedJournal === j.id && j.details.length > 0 && (
-<tr className="bg-slate-50">
-<td colSpan="4" className="p-4">
-<table className="w-full text-xs">
-<thead>
-<tr className="border-b border-slate-200">
-<th className="text-left py-2 px-2 font-semibold text-slate-600">Account</th>
-<th className="text-right py-2 px-2 font-semibold text-slate-600">DR</th>
-<th className="text-right py-2 px-2 font-semibold text-slate-600">CR</th>
-</tr>
-</thead>
-<tbody>
-{j.details.map((detail, idx) => (
-<tr key={idx} className="border-b border-slate-200">
-<td className="py-2 px-2 text-slate-700">{detail.account}</td>
-<td className="text-right py-2 px-2 text-slate-900 font-medium">{detail.dr}</td>
-<td className="text-right py-2 px-2 text-slate-900 font-medium">{detail.cr}</td>
-</tr>
-))}
-</tbody>
-</table>
-</td>
-</tr>
-)}
 </React.Fragment>
 ))}
 </tbody>
 </table>
 </div>
-<div className="chart-container text-center py-4">
-<p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-[PI] MECE Verified Badge
-</p>
-</div>
 </div>
 );
 };
+
 // Page: Settlement Detail
 const SettlementDetail = () => {
 const metrics = [
@@ -1516,12 +1436,568 @@ Confirm & Dispatch
 </div>
 );
 };
+
+// Data Pipeline Component - 5 Step Wizard
+const DataPipeline = ({ onApplyData }) => {
+const [currentStep, setCurrentStep] = useState(1);
+const [uploadedFiles, setUploadedFiles] = useState([]);
+const [rawData, setRawData] = useState([]);
+const [cleaningRules, setCleaningRules] = useState({
+duplicateRemoval: true,
+formatUnification: true,
+anomalyDetection: true,
+theaterMapping: true
+});
+const [cleanedData, setCleanedData] = useState([]);
+const [success, setSuccess] = useState(false);
+
+const dropZoneRef = useRef(null);
+
+// Theater templates
+const theaterTemplates = {
+cgv: { columns: ['날짜', '영화명', '상영횟수', '관객수', '매출액', '정산비율'], name: 'CGV' },
+lotte: { columns: ['상영일', '작품명', '스크린수', '회차', '입장객', '총매출', '배급비율'], name: 'Lotte Cinema' },
+megabox: { columns: ['Date', 'Film', 'Screen', 'Sessions', 'Admissions', 'BoxOffice', 'RS%'], name: 'Megabox' }
+};
+
+const standardSchema = ['date', 'movie', 'screens', 'showings', 'audience', 'revenue', 'rs_ratio'];
+
+const detectTheaterType = (headers) => {
+const headerStr = headers.map(h => (h || '').toLowerCase()).join('|');
+if (headerStr.includes('날짜') || headerStr.includes('영화명')) return 'cgv';
+if (headerStr.includes('상영일') || headerStr.includes('작품명')) return 'lotte';
+if (headerStr.includes('date') && headerStr.includes('film')) return 'megabox';
+return null;
+};
+
+const generateSampleData = () => {
+const theaters = [
+{ name: 'CGV 강남', code: 'CGV001', template: 'cgv', movies: ['범죄도시4', '듄: 파트2', '윙카'] },
+{ name: 'Lotte Cinema 월드타워', code: 'LOT001', template: 'lotte', movies: ['범㣄도시4', '듄: 파트2', '윙카'] },
+{ name: 'Megabox 코엑스', code: 'MB001', template: 'megabox', movies: ['범㣄도시4', '듄: 파트2', '윙카'] }
+];
+
+const samples = [];
+theaters.forEach((theater, tIdx) => {
+const template = theaterTemplates[theater.template];
+for (let i = 0; i < 20; i++) {
+const date = new Date(2024, 2, (i % 28) + 1);
+const dateStr = theater.template === 'megabox'
+? `2024-03-${String((i % 28) + 1).padStart(2, '0')}`
+: `2024.03.${String((i % 28) + 1).padStart(2, '0')}`;
+const movie = theater.movies[i % theater.movies.length];
+const audience = 5000 + Math.floor(Math.random() * 35000);
+const revenue = audience * (8000 + Math.floor(Math.random() * 12000));
+
+if (theater.template === 'cgv') {
+samples.push({
+'날짜': dateStr,
+'영화명': movie,
+'상영횟수': String(3 + Math.floor(Math.random() * 5)),
+'관객수': String(audience),
+'매출액': String(revenue),
+'정산비율': String((40 + Math.random() * 10).toFixed(1))
+});
+} else if (theater.template === 'lotte') {
+samples.push({
+'상영일': dateStr,
+'작품명': movie,
+'스크린수': String(2 + Math.floor(Math.random() * 3)),
+'회차': String(4 + Math.floor(Math.random() * 4)),
+'입장객': String(audience),
+'총매출': String(revenue),
+'배급비율': String((40 + Math.random() * 10).toFixed(1))
+});
+} else {
+samples.push({
+'Date': dateStr,
+'Film': movie,
+'Screen': String(2 + Math.floor(Math.random() * 3)),
+'Sessions': String(4 + Math.floor(Math.random() * 4)),
+'Admissions': String(audience),
+'BoxOffice': String(revenue),
+'RS%': String((40 + Math.random() * 10).toFixed(1))
+});
+}
+}
+});
+
+setRawData(samples);
+setUploadedFiles([
+{ name: 'sample_cgv.xlsx', size: '15 KB', theater: 'CGV' },
+{ name: 'sample_lotte.xlsx', size: '18 KB', theater: 'Lotte Cinema' },
+{ name: 'sample_megabox.xlsx', size: '16 KB', theater: 'Megabox' }
+]);
+};
+
+const handleDragOver = (e) => {
+e.preventDefault();
+dropZoneRef.current?.classList.add('dragover');
+};
+
+const handleDragLeave = () => {
+dropZoneRef.current?.classList.remove('dragover');
+};
+
+const handleDrop = (e) => {
+e.preventDefault();
+dropZoneRef.current?.classList.remove('dragover');
+handleFiles(e.dataTransfer.files);
+};
+
+const handleFiles = (files) => {
+Array.from(files).forEach(file => {
+if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
+const reader = new FileReader();
+reader.onload = (e) => {
+try {
+const workbook = window.XLSX.read(e.target.result, { type: 'binary' });
+const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+const data = window.XLSX.utils.sheet_to_json(firstSheet);
+setRawData(prev => [...prev, ...data]);
+setUploadedFiles(prev => [...prev, { name: file.name, size: (file.size / 1024).toFixed(0) + ' KB', theater: 'Detected' }]);
+} catch (error) {
+console.error('Error reading file:', error);
+}
+};
+reader.readAsBinaryString(file);
+}
+});
+};
+
+const handleApplyRules = () => {
+let cleaned = [...rawData];
+
+if (cleaningRules.duplicateRemoval) {
+const seen = new Set();
+cleaned = cleaned.filter(row => {
+const key = `${row.date}|${row.theater}|${row.movie}`;
+if (seen.has(key)) return false;
+seen.add(key);
+return true;
+});
+}
+
+if (cleaningRules.formatUnification) {
+cleaned = cleaned.map(row => {
+const formatted = { ...row };
+return formatted;
+});
+}
+
+if (cleaningRules.anomalyDetection) {
+cleaned = cleaned.map(row => ({
+...row,
+_flagged: (row.revenue < 0 || row.audience > 50000 || !row.date || !row.revenue)
+}));
+}
+
+setCleanedData(cleaned);
+};
+
+const StepIndicator = () => (
+<div className="step-indicator">
+{[1, 2, 3, 4, 5].map(step => (
+<div key={step} className="flex flex-col items-center">
+<div className={`step-circle ${step === currentStep ? 'active' : step < currentStep ? 'completed' : ''}`}>
+{step < currentStep ? <IconCheckCircle /> : step}
+</div>
+<div className={`step-label ${step === currentStep ? 'active' : ''}`}>
+{['업로드', '미리보기', '정제', '검토', '반영'][step - 1]}
+</div>
+</div>
+))}
+</div>
+);
+
+return (
+<div className="page-fade-in space-y-6">
+<StepIndicator />
+
+{currentStep === 1 && (
+<div className="step-content space-y-6">
+<div className="chart-container">
+<p className="section-label">Step 1</p>
+<p className="section-title">파일 업로드</p>
+<p className="text-sm text-slate-600 mb-4">Excel 파일을 선택하거나 드래그하여 드롭하세요 (.xlsx, .xls, .csv)</p>
+<div
+ref={dropZoneRef}
+onDragOver={handleDragOver}
+onDragLeave={handleDragLeave}
+onDrop={handleDrop}
+className="drop-zone cursor-pointer"
+>
+<IconUpload className="drop-zone-icon" />
+<p className="text-sm font-medium text-slate-900 mb-1">파일 업로드</p>
+<p className="text-xs text-slate-600">또는 클릭하여 파일을 선택하세요</p>
+</div>
+<input
+type="file"
+multiple
+accept=".xlsx,.xls,.csv"
+onChange={(e) => handleFiles(e.target.files)}
+className="hidden"
+id="fileInput"
+/>
+<button
+onClick={() => document.getElementById('fileInput').click()}
+className="w-full mt-4 px-4 py-2 border-2 border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
+>
+파일 선택
+</button>
+</div>
+
+<button
+onClick={generateSampleData}
+className="w-full px-4 py-2 border-2 border-blue-400 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition"
+>
+샘플 데이터 생성
+</button>
+
+{uploadedFiles.length > 0 && (
+<div className="file-list">
+<p className="font-semibold text-slate-900 mb-3">업로드된 파일 ({uploadedFiles.length})</p>
+{uploadedFiles.map((file, idx) => (
+<div key={idx} className="file-item">
+<div>
+<p className="font-medium text-slate-900">{file.name}</p>
+<p className="text-xs text-slate-500">{file.size}</p>
+</div>
+<span className="chip blue">{file.theater}</span>
+</div>
+))}
+</div>
+)}
+
+<div className="flex gap-4 justify-end">
+<button
+onClick={() => {
+setCurrentStep(2);
+}}
+disabled={uploadedFiles.length === 0}
+className="gradient-button px-6 py-2 disabled:opacity-50"
+>
+다음
+</button>
+</div>
+</div>
+)}
+
+{currentStep === 2 && (
+<div className="step-content space-y-6">
+<div className="chart-container">
+<p className="section-label">Step 2</p>
+<p className="section-title">데이터 미리보기</p>
+<div className="overflow-x-auto">
+<table className="w-full text-sm">
+<thead className="bg-slate-100 border-b border-slate-200">
+<tr>
+{Object.keys(rawData[0] || {}).slice(0, 7).map(col => (
+<th key={col} className="px-4 py-2 text-left font-semibold text-slate-700">
+{col}
+</th>
+))}
+</tr>
+</thead>
+<tbody>
+{rawData.slice(0, 20).map((row, idx) => (
+<tr key={idx} className="border-b border-slate-200 hover:bg-slate-50">
+{Object.values(row).slice(0, 7).map((val, vIdx) => (
+<td key={vIdx} className="px-4 py-2 text-slate-600">
+{String(val).substring(0, 30)}
+</td>
+))}
+</tr>
+))}
+</tbody>
+</table>
+</div>
+<p className="text-xs text-slate-500 mt-4">{rawData.length}개 행 중 처음 20개 행 표시</p>
+</div>
+
+<div className="flex gap-4 justify-between">
+<button
+onClick={() => setCurrentStep(1)}
+className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
+>
+이전
+</button>
+<button
+onClick={() => setCurrentStep(3)}
+className="gradient-button px-6 py-2"
+>
+다음
+</button>
+</div>
+</div>
+)}
+
+{currentStep === 3 && (
+<div className="step-content space-y-6">
+<div className="chart-container">
+<p className="section-label">Step 3</p>
+<p className="section-title">데이터 정제</p>
+<p className="text-sm text-slate-600 mb-6">다음 정제 규칙을 선택하여 적용하세요</p>
+
+<div className="space-y-3">
+<label className="cleaning-rule cursor-pointer">
+<input
+type="checkbox"
+checked={cleaningRules.duplicateRemoval}
+onChange={(e) => setCleaningRules({...cleaningRules, duplicateRemoval: e.target.checked})}
+className="hidden"
+/>
+<button
+onClick={() => setCleaningRules({...cleaningRules, duplicateRemoval: !cleaningRules.duplicateRemoval})}
+className="rule-toggle"
+style={cleaningRules.duplicateRemoval ? {backgroundColor: '#006243'} : {}}
+/>
+<div className="rule-info">
+<p className="rule-name">중복 행 제거</p>
+<p className="rule-description">날짜+극장+영화 조합으로 중복 감지</p>
+</div>
+<p className="rule-count">{Math.max(0, rawData.length - new Set(rawData.map(r => `${r.date}|${r.theater}|${r.movie}`)).size)} 행</p>
+</label>
+
+<label className="cleaning-rule cursor-pointer">
+<input
+type="checkbox"
+checked={cleaningRules.formatUnification}
+onChange={(e) => setCleaningRules({...cleaningRules, formatUnification: e.target.checked})}
+className="hidden"
+/>
+<button
+onClick={() => setCleaningRules({...cleaningRules, formatUnification: !cleaningRules.formatUnification})}
+className="rule-toggle"
+style={cleaningRules.formatUnification ? {backgroundColor: '#006243'} : {}}
+/>
+<div className="rule-info">
+<p className="rule-name">포맷 통일</p>
+<p className="rule-description">날짜를 YYYY-MM-DD로 정규화, 금액을 숫자로 변환</p>
+</div>
+<p className="rule-count">모든 행</p>
+</label>
+
+<label className="cleaning-rule cursor-pointer">
+<input
+type="checkbox"
+checked={cleaningRules.anomalyDetection}
+onChange={(e) => setCleaningRules({...cleaningRules, anomalyDetection: e.target.checked})}
+className="hidden"
+/>
+<button
+onClick={() => setCleaningRules({...cleaningRules, anomalyDetection: !cleaningRules.anomalyDetection})}
+className="rule-toggle"
+style={cleaningRules.anomalyDetection ? {backgroundColor: '#006243'} : {}}
+/>
+<div className="rule-info">
+<p className="rule-name">이상치 탐지</p>
+<p className="rule-description">음수 매출, 50,000명 이상 관객, 빈 값 플래그</p>
+</div>
+<p className="rule-count">{rawData.filter(r => r.revenue < 0 || r.audience > 50000 || !r.date).length} 행</p>
+</label>
+
+<label className="cleaning-rule cursor-pointer">
+<input
+type="checkbox"
+checked={cleaningRules.theaterMapping}
+onChange={(e) => setCleaningRules({...cleaningRules, theaterMapping: e.target.checked})}
+className="hidden"
+/>
+<button
+onClick={() => setCleaningRules({...cleaningRules, theaterMapping: !cleaningRules.theaterMapping})}
+className="rule-toggle"
+style={cleaningRules.theaterMapping ? {backgroundColor: '#006243'} : {}}
+/>
+<div className="rule-info">
+<p className="rule-name">극장별 템플릿 매핑</p>
+<p className="rule-description">극장 특정 열을 표준 스키마로 변환</p>
+</div>
+<p className="rule-count">모든 행</p>
+</label>
+</div>
+</div>
+
+<div className="flex gap-4 justify-between">
+<button
+onClick={() => setCurrentStep(2)}
+className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
+>
+이전
+</button>
+<button
+onClick={() => {
+handleApplyRules();
+setCurrentStep(4);
+}}
+className="gradient-button px-6 py-2"
+>
+정제 적용
+</button>
+</div>
+</div>
+)}
+
+{currentStep === 4 && (
+<div className="step-content space-y-6">
+<div className="chart-container">
+<p className="section-label">Step 4</p>
+<p className="section-title">정제 결과 검토</p>
+
+<div className="grid grid-cols-4 gap-4 mb-6">
+<div className="summary-stat">
+<p className="summary-stat-label">원본 행</p>
+<p className="summary-stat-value">{rawData.length}</p>
+</div>
+<div className="summary-stat">
+<p className="summary-stat-label">정제된 행</p>
+<p className="summary-stat-value">{cleanedData.filter(r => !r._flagged).length}</p>
+</div>
+<div className="summary-stat">
+<p className="summary-stat-label">플래그된 행</p>
+<p className="summary-stat-value">{cleanedData.filter(r => r._flagged).length}</p>
+</div>
+<div className="summary-stat">
+<p className="summary-stat-label">정제율</p>
+<p className="summary-stat-value">{((cleanedData.filter(r => !r._flagged).length / rawData.length) * 100).toFixed(1)}%</p>
+</div>
+</div>
+
+<div className="overflow-x-auto bg-white rounded-lg border">
+<table className="w-full text-sm">
+<thead className="bg-slate-100 border-b border-slate-200">
+<tr>
+{Object.keys(cleanedData[0] || {}).slice(0, 6).map(col => (
+<th key={col} className="px-4 py-2 text-left font-semibold text-slate-700">
+{col}
+</th>
+))}
+<th className="px-4 py-2 text-left font-semibold text-slate-700">상태</th>
+</tr>
+</thead>
+<tbody>
+{cleanedData.slice(0, 20).map((row, idx) => (
+<tr key={idx} className={`border-b border-slate-200 ${row._flagged ? 'bg-red-50' : 'hover:bg-slate-50'}`}>
+{Object.entries(row).slice(0, 6).map(([key, val]) => (
+<td key={key} className="px-4 py-2 text-slate-600">
+{String(val).substring(0, 25)}
+</td>
+))}
+<td className="px-4 py-2">
+{row._flagged && <span className="chip red">플래그</span>}
+{!row._flagged && <span className="chip green">정상</span>}
+</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+</div>
+
+<div className="flex gap-4 justify-between">
+<button
+onClick={() => setCurrentStep(3)}
+className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
+>
+이전
+</button>
+<button
+onClick={() => {
+const ws = window.XLSX.utils.json_to_sheet(cleanedData.filter(r => !r._flagged));
+const wb = window.XLSX.utils.book_new();
+window.XLSX.utils.book_append_sheet(wb, ws, 'Cleaned Data');
+window.XLSX.writeFile(wb, 'cleaned_data.xlsx');
+}}
+className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition flex items-center gap-2"
+>
+<IconDownload className="w-4 h-4" />
+다운로드
+</button>
+<button
+onClick={() => setCurrentStep(5)}
+className="gradient-button px-6 py-2"
+>
+다음
+</button>
+</div>
+</div>
+)}
+
+{currentStep === 5 && (
+<div className="step-content space-y-6">
+<div className="chart-container">
+<p className="section-label">Step 5</p>
+<p className="section-title">데이터 반영 확인</p>
+
+<div className={`rounded-lg border-2 border-green-200 bg-green-50 p-6 text-center ${success ? 'success-animation' : ''}`}>
+<IconCheckCircle className="w-16 h-16 mx-auto text-green-600 mb-4" />
+<p className="text-lg font-bold text-green-900">정제 완료</p>
+<p className="text-sm text-green-700 mt-2">
+{cleanedData.filter(r => !r._flagged).length}개의 정제된 행이 대시보드에 반영될 준비가 완료되었습니다.
+</p>
+</div>
+
+<div className="bg-white rounded-lg border border-slate-200 p-6">
+<p className="font-semibold text-slate-900 mb-4">반영 요약</p>
+<div className="space-y-3 text-sm">
+<div className="flex justify-between">
+<span className="text-slate-600">원본 데이터</span>
+<span className="font-medium text-slate-900">{rawData.length}개 행</span>
+</div>
+<div className="flex justify-between border-t pt-3">
+<span className="text-slate-600">정제된 데이터</span>
+<span className="font-medium text-slate-900">{cleanedData.filter(r => !r._flagged).length}개 행</span>
+</div>
+<div className="flex justify-between">
+<span className="text-slate-600">플래그된 이상치</span>
+<span className="font-medium text-slate-900">{cleanedData.filter(r => r._flagged).length}개 행</span>
+</div>
+<div className="flex justify-between border-t pt-3">
+<span className="text-slate-600">정제율</span>
+<span className="font-medium text-green-600">{((cleanedData.filter(r => !r._flagged).length / rawData.length) * 100).toFixed(1)}%</span>
+</div>
+</div>
+</div>
+
+<div className="flex gap-4 justify-between">
+<button
+onClick={() => setCurrentStep(4)}
+className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
+>
+이전
+</button>
+<button
+onClick={() => {
+setSuccess(true);
+onApplyData(cleanedData.filter(r => !r._flagged));
+setTimeout(() => {
+setCurrentStep(1);
+setUploadedFiles([]);
+setRawData([]);
+setCleanedData([]);
+setSuccess(false);
+}, 2000);
+}}
+className="gradient-button px-6 py-2 flex items-center gap-2"
+>
+<IconCheckCircle className="w-4 h-4" />
+대시보드에 반영
+</button>
+</div>
+</div>
+)}
+</div>
+);
+};
+
 // Main App Component
 const App = () => {
 const [currentPage, setCurrentPage] = useState('home');
+const [pipelineData, setPipelineData] = useState([]);
+
 const pageMap = {
 'home': <CEOInsightBoard />,
-'operations': <OperationsDashboard />,
+'operations': <OperationsDashboard pipelineData={pipelineData} />,
 'contracts': <ContractsMaster />,
 'approvals': <ApprovalCenter />,
 'anomalies': <AnomalyDetection />,
@@ -1529,8 +2005,10 @@ const pageMap = {
 'cashflow': <CashFlowForecast />,
 'quality': <DataQuality />,
 'journal': <JournalEntries />,
-'settlement': <SettlementDetail />
+'settlement': <SettlementDetail />,
+'pipeline': <DataPipeline onApplyData={(data) => setPipelineData(data)} />
 };
+
 useEffect(() => {
 const handleHashChange = () => {
 const hash = window.location.hash.slice(1) || 'home';
@@ -1540,6 +2018,7 @@ window.addEventListener('hashchange', handleHashChange);
 handleHashChange();
 return () => window.removeEventListener('hashchange', handleHashChange);
 }, []);
+
 return (
 <div className="flex h-screen bg-slate-50">
 <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
@@ -1552,6 +2031,7 @@ return (
 </div>
 );
 };
+
 ReactDOM.render(<App />, document.getElementById('app'));
 </script>
 </body>
