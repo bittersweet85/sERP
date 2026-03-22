@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinema AR Settlement Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<style>
+* {
+font-family: 'Inter', 'Noto Sans KR', sans-serif;
+}
+.korean-text {
+font-family: 'Noto Sans KR', sans-serif;
+}
+body {
+background-color: #f7f9fb;
+}
+.glass-header {
+background: rgba(255, 255, 255, 0.8);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+}
+.sidebar-bg {
+background-color: #f8fafc;
+}
+.active-nav {
+background-color: white;
+color: #004ac6;
+box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+.status-active {
+background-color: #f0fdf4;
+color: #006243;
+}
+.status-pending {
+background-color: #fffbeb;
+color: #b45309;
+}
+.status-review {
+background-color: #fef3c7;
+color: #b45309;
+}
+.status-rejected {
+background-color: #fef2f2;
+color: #ba1a1a;
+}
+.status-verified {
+background-color: #f0fdf4;
+color: #006243;
+}
+.status-critical {
+background-color: #fef2f2;
+color: #ba1a1a;
+}
+.metric-card {
+background: white;
+border-radius: 0.75rem;
+padding: 1.25rem;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.metric-value {
+font-size: 1.875rem;
+font-weight: 700;
+color: #191c1e;
+margin: 0.5rem 0;
+}
+.metric-label {
+font-size: 0.875rem;
+color: #94a3b8;
+font-weight: 500;
+}
+.metric-change {
+font-size: 0.875rem;
+font-weight: 600;
+margin-top: 0.5rem;
+}
+.metric-change.positive {
+color: #16a34a;
+}
+.metric-change.negative {
+color: #ba1a1a;
+}
+.gradient-button {
+background: linear-gradient(135deg, #004ac6 0%, #2563eb 100%);
+color: white;
+border: none;
+padding: 0.625rem 1.25rem;
+border-radius: 0.5rem;
+font-weight: 600;
+cursor: pointer;
+transition: opacity 0.2s;
+}
+.gradient-button:hover {
+opacity: 0.9;
+}
+.insight-card {
+background: white;
+border-radius: 0.75rem;
+padding: 1.25rem;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+border-left: 4px solid;
+margin-bottom: 0.75rem;
+}
+.insight-card.blue {
+border-left-color: #004ac6;
+}
+.insight-card.green {
+border-left-color: #006243;
+}
+.insight-card.yellow {
+border-left-color: #eab308;
+}
+.insight-card.gray {
+border-left-color: #94a3b8;
+}
+.insight-title {
+font-size: 0.875rem;
+font-weight: 600;
+color: #64748b;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+}
+.insight-content {
+font-size: 0.95rem;
+color: #191c1e;
+margin-top: 0.5rem;
+font-weight: 500;
+}
+.table-container {
+background: white;
+border-radius: 0.75rem;
+overflow: hidden;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.table-header {
+background-color: #f8fafc;
+border-bottom: 1px solid #e2e8f0;
+}
+.table-header th {
+padding: 1rem;
+text-align: left;
+font-weight: 600;
+font-size: 0.875rem;
+color: #64748b;
+}
+.table-row {
+border-bottom: 1px solid #e2e8f0;
+padding: 0;
+}
+.table-row:last-child {
+border-bottom: none;
+}
+.table-row:hover {
+background-color: #f8fafc;
+}
+.table-cell {
+padding: 1rem;
+font-size: 0.875rem;
+}
+.progress-bar {
+background-color: #e2e8f0;
+border-radius: 9999px;
+height: 0.5rem;
+overflow: hidden;
+}
+.progress-fill {
+background: linear-gradient(90deg, #004ac6 0%, #2563eb 100%);
+height: 100%;
+border-radius: 9999px;
+transition: width 0.3s ease;
+}
+.page-fade-in {
+animation: fadeIn 0.3s ease-in-out;
+}
+@keyframes fadeIn {
+from {
+opacity: 0;
+}
+to {
+opacity: 1;
+}
+}
+.chip {
+display: inline-block;
+padding: 0.25rem 0.75rem;
+border-radius: 9999px;
+font-size: 0.75rem;
+font-weight: 600;
+white-space: nowrap;
+}
+.chip.blue {
+background-color: #dbeafe;
+color: #0c4a6e;
+}
+.chip.green {
+background-color: #dcfce7;
+color: #166534;
+}
+.chip.yellow {
+background-color: #fef3c7;
+color: #92400e;
+}
+.chip.red {
+background-color: #fee2e2;
+color: #7f1d1d;
+}
+.chart-container {
+background: white;
+border-radius: 0.75rem;
+padding: 1.5rem;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.section-title {
+font-size: 1.125rem;
+font-weight: 700;
+color: #191c1e;
+margin-bottom: 1.25rem;
+}
+.section-label {
+font-size: 0.75rem;
+font-weight: 600;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+color: #94a3b8;
+margin-bottom: 0.5rem;
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } = window.Recharts;
+// SVG Icons
+const IconHome = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+);
+const IconDatabase = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+<path d="M3 5v14a9 3 0 0 0 18 0V5"></path>
+<path d="M3 12a9 3 0 0 0 18 0"></path>
+</svg>
+);
+const IconFileText = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+<polyline points="13 2 13 9 20 9"></polyline>
+</svg>
+);
+const IconBarChart = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<line x1="12" y1="2" x2="12" y2="22"></line>
+<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h.5M7 12a3.5 3.5 0 0 1 0 7h8"></path>
+</svg>
+);
+const IconShield = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+</svg>
+);
+const IconReceipt = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M6 9h12M6 9c-1 0-2 .9-2 2v7c0 1.1 1 2 2 2h12c1 0 2-.9 2-2v-7c0-1.1-1-2-2-2m0 0V7c0-1-1-2-2-2h-8c-1 0-2 1-2 2v2"></path>
+<path d="M9 14h6"></path>
+</svg>
+);
+const IconSettings = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<circle cx="12" cy="12" r="3"></circle>
+<path d="M12 1v6m0 6v6m4.22-15.22l-4.24 4.24m0 5.96l4.24 4.24m-9.92 0l-4.24-4.24m0-5.96l4.24-4.24"></path>
+</svg>
+);
+const IconSearch = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<circle cx="11" cy="11" r="8"></circle>
+<path d="m21 21-4.35-4.35"></path>
+</svg>
+);
+const IconBell = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+<path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+</svg>
+);
+const IconHelpCircle = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<circle cx="12" cy="12" r="10"></circle>
+<path d="M12 16v-4M12 8h.01"></path>
+</svg>
+);
+const IconLogOut = () => (
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+<polyline points="16 17 21 12 16 7"></polyline>
+<line x1="21" y1="12" x2="9" y2="12"></line>
+</svg>
+);
+const IconChevronDown = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+);
+const IconPlus = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<line x1="12" y1="5" x2="12" y2="19"></line>
+<line x1="5" y1="12" x2="19" y2="12"></line>
+</svg>
+);
+const IconFilter = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+</svg>
+);
+const IconDownload = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+<polyline points="7 10 12 15 17 10"></polyline>
+<line x1="12" y1="15" x2="12" y2="3"></line>
+</svg>
+);
+const IconEye = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+<circle cx="12" cy="12" r="3"></circle>
+</svg>
+);
+const IconAlertTriangle = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+<line x1="12" y1="9" x2="12" y2="13"></line>
+<line x1="12" y1="17" x2="12.01" y2="17"></line>
+</svg>
+);
+const IconCheckCircle = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+<polyline points="22 4 12 14.01 9 11.01"></polyline>
+</svg>
+);
+const IconXCircle = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="15" y1="9" x2="9" y2="15"></line>
+<line x1="9" y1="9" x2="15" y2="15"></line>
+</svg>
+);
+const IconTrendingUp = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<polyline points="23 6 13.5 15.5 8.5 10.5 1 17"></polyline>
+<polyline points="17 6 23 6 23 12"></polyline>
+</svg>
+);
+const IconClock = () => (
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+);
+const IconArrowUp = () => (
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<line x1="12" y1="19" x2="12" y2="5"></line>
+<polyline points="5 12 12 5 19 12"></polyline>
+</svg>
+);
+const IconArrowDown = () => (
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+<line x1="12" y1="5" x2="12" y2="19"></line>
+<polyline points="19 12 12 19 5 12"></polyline>
+</svg>
+);
+// Header Component
+const Header = ({ currentPage }) => {
+const pageLabels = {
+'home': 'EXECUTIVE OVERVIEW',
+'operations': 'OPERATIONS',
+'contracts': 'CONTRACT MANAGEMENT',
+'approvals': 'APPROVAL CENTER',
+'anomalies': 'ANOMALY DETECTION',
+'theater': 'THEATER PERFORMANCE',
+'cashflow': 'CASH FLOW',
+'quality': 'DATA QUALITY',
+'journal': 'JOURNAL ENTRIES',
+'settlement': 'SETTLEMENT'
+};
+const pageTitles = {
+'home': 'CEO Insight Board',
+'operations': 'Operations Dashboard',
+'contracts': 'ê³ì½ ë§ì¤í°',
+'approvals': 'ì¹ì¸ ì¼í°',
+'anomalies': 'ì´ì ì§í íì§',
+'theater': 'ê·¹ì¥ ì±ê³¼ ë¶ì',
+'cashflow': 'íê¸íë¦ ìì¸¡',
+'quality': 'ë°ì´í° íì§ ëª¨ëí°',
+'journal': 'ë¶ê° ì í',
+'settlement': 'ì ì° ë¨ê³ë³ ìì¸'
+};
+return (
+<div className="fixed top-0 right-0 left-64 h-16 glass-header border-b border-slate-200 flex items-center justify-between px-8 z-40">
+<div>
+<p className="text-xs font-semibold text-slate-500 uppercase letter-spacing tracking-wider">{pageLabels[currentPage] || 'Dashboard'}</p>
+<p className="text-lg font-bold text-slate-900">{pageTitles[currentPage] || 'Cinema AR Settlement Engine'}</p>
+</div>
+<div className="flex items-center gap-4">
+<div className="relative hidden md:block">
+<IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+<input
+type="text"
+placeholder="Search..."
+className="pl-10 pr-4 py-2 rounded-full bg-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+/>
+</div>
+<button className="p-2 hover:bg-slate-100 rounded-full transition">
+<IconBell />
+</button>
+<button className="p-2 hover:bg-slate-100 rounded-full transition">
+<IconHelpCircle />
+</button>
+<button className="p-2 hover:bg-slate-100 rounded-full transition">
+<IconSettings />
+</button>
+<div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full"></div>
+</div>
+</div>
+);
+};
+// Sidebar Component
+const Sidebar = ({ currentPage, setCurrentPage }) => {
+const navItems = [
+{ id: 'home', label: 'HOME', icon: IconHome },
+{ id: 'contracts', label: 'MASTER', icon: IconDatabase },
+{ id: 'operations', label: 'DATA', icon: IconFileText },
+{ id: 'settlement', label: 'SETTLEMENT', icon: IconReceipt },
+{ id: 'approvals', label: 'CONTROL', icon: IconShield },
+{ id: 'theater', label: 'ANALYSIS', icon: IconBarChart },
+{ id: 'quality', label: 'SYSTEM', icon: IconSettings }
+];
+return (
+<div className="fixed left-0 top-0 w-64 h-screen sidebar-bg border-r border-slate-200 pt-8 pb-8 flex flex-col z-50">
+<div className="px-6 mb-8">
+<p className="text-sm font-bold text-slate-900">Settlement Engine</p>
+<p className="text-xs font-semibold text-blue-600 mt-1">CINEMA AR V2.4</p>
+</div>
+<div className="px-6 mb-4">
+<p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Main Menu</p>
+</div>
+<nav className="flex-1 overflow-y-auto px-4 space-y-2">
+{navItems.map(item => {
+const Icon = item.icon;
+return (
+<button
+key={item.id}
+onClick={() => setCurrentPage(item.id)}
+className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
+currentPage === item.id
+? 'active-nav'
+: 'text-slate-600 hover:bg-slate-100'
+}`}
+>
+<Icon />
+{item.label}
+</button>
+);
+})}
+</nav>
+<div className="px-4 space-y-3 pt-4 border-t border-slate-200">
+<button className="w-full gradient-button flex items-center justify-center gap-2">
+<IconPlus />
+New Settlement
+</button>
+<div className="space-y-2 text-sm">
+<button className="w-full text-left px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">
+Support
+</button>
+<button className="w-full text-left px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition flex items-center gap-2">
+<IconLogOut className="w-4 h-4" />
+Logout
+</button>
+</div>
+</div>
+</div>
+);
+};
+// Page: CEO Insight Board
+const CEOInsightBoard = () => {
+const metrics = [
+{ label: 'Total AR', value: 'â©89,621,293', change: '+12.3%', positive: true },
+{ label: 'Gross Revenue', value: 'â©79,280,000', change: '+8.7%', positive: true },
+{ label: 'ì´ì ì§í', value: '17ê±´', change: '-2ê±´', positive: true },
+{ label: 'ë¦¬ì¤í¬ ì ì', value: '72/100', change: '-3pts', positive: true }
+];
+const regionData = [
+{ name: 'Seoul Metropolitan', percentage: 82 },
+{ name: 'Gyeonggi Province', percentage: 64 },
+{ name: 'Busan/Southern', percentage: 41 }
+];
+return (
+<div className="page-fade-in">
+<div className="grid grid-cols-4 gap-6 mb-8">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value">{m.value}</p>
+<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
+{m.positive ? <IconArrowUp className="inline mr-1" /> : <IconArrowDown className="inline mr-1" />}
+{m.change}
+</p>
+</div>
+))}
+</div>
+<div className="grid grid-cols-3 gap-6">
+<div className="col-span-1 space-y-6">
+<div className="chart-container">
+<p className="section-label">Risk Status</p>
+<p className="section-title">Risk Radar</p>
+<div className="space-y-4">
+<div>
+<div className="flex justify-between mb-2">
+<span className="text-sm font-medium text-slate-700">Critical Risks</span>
+<span className="text-sm font-bold text-red-600">5/10</span>
+</div>
+<div className="progress-bar">
+<div className="progress-fill" style={{ width: '50%', background: '#ba1a1a' }}></div>
+</div>
+</div>
+<div>
+<div className="flex justify-between mb-2">
+<span className="text-sm font-medium text-slate-700">Warning Alerts</span>
+<span className="text-sm font-bold text-yellow-600">8/15</span>
+</div>
+<div className="progress-bar">
+<div className="progress-fill" style={{ width: '53%', background: '#ca8a04' }}></div>
+</div>
+</div>
+</div>
+</div>
+<div className="chart-container">
+<p className="section-label">Performance</p>
+<p className="section-title">MG Achievement</p>
+<div className="space-y-4">
+{regionData.map((r, i) => (
+<div key={i}>
+<div className="flex justify-between mb-2">
+<span className="text-sm font-medium text-slate-700">{r.name}</span>
+<span className="text-sm font-bold text-blue-600">{r.percentage}%</span>
+</div>
+<div className="progress-bar">
+<div className="progress-fill" style={{ width: `${r.percentage}%` }}></div>
+</div>
+</div>
+))}
+</div>
+</div>
+</div>
+<div className="col-span-2">
+<div className="chart-container">
+<p className="section-label">Intelligence</p>
+<p className="section-title">AI Insight Cards</p>
+<div className="space-y-3">
+<div className="insight-card blue">
+<p className="insight-title">Projects</p>
+<p className="insight-content">ê°ë¨ ì§ì­ ì´ì ì§í ê°ì§ë¨</p>
+</div>
+<div className="insight-card green">
+<p className="insight-title">Areas</p>
+<p className="insight-content">íê¸ ì ì° ë¹ì¤ ê°ì ì¶ì¸</p>
+</div>
+<div className="insight-card yellow">
+<p className="insight-title">Resources</p>
+<p className="insight-content">ìë°ì´í¸ë ì¸ë¬´ ì§ì¹¨ì</p>
+</div>
+<div className="insight-card gray">
+<p className="insight-title">Archives</p>
+<p className="insight-content">2022ë Q3 ê²°ì° ë°ì´í° ì´ê´</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+);
+};
+// Page: Operations Dashboard
+const OperationsDashboard = () => {
+const metrics = [
+{ label: 'Total AR', value: '$4,281,902', change: '+12.4%', positive: true },
+{ label: 'Gross Revenue', value: '$12,940,551', change: '+8.1%', positive: true },
+{ label: 'Active Theater Count', value: '842', change: 'Stable', positive: true },
+{ label: 'Detected Anomalies', value: '24', change: '-3', positive: true }
+];
+const revenueData = [
+{ month: 'Jan', 'Gross Revenue': 8900000, 'AR': 3200000 },
+{ month: 'Feb', 'Gross Revenue': 9200000, 'AR': 3400000 },
+{ month: 'Mar', 'Gross Revenue': 8800000, 'AR': 3100000 },
+{ month: 'Apr', 'Gross Revenue': 10100000, 'AR': 3800000 },
+{ month: 'May', 'Gross Revenue': 11200000, 'AR': 4200000 },
+{ month: 'Jun', 'Gross Revenue': 12300000, 'AR': 4500000 },
+{ month: 'Jul', 'Gross Revenue': 12940551, 'AR': 4681902 }
+];
+const pipelineData = [
+{ name: 'Verification', percentage: 82 },
+{ name: 'Approval Queue', percentage: 45 },
+{ name: 'Final Settlement', percentage: 61 }
+];
+const theaterRanking = [
+{ rank: 1, name: 'CGV Gangnam', ar: 4250000 },
+{ rank: 2, name: 'Lotte Cinema Busan', ar: 2120000 },
+{ rank: 3, name: 'Megabox COEX', ar: 1890000 },
+{ rank: 4, name: 'Indie Cinema Network', ar: 430000 },
+{ rank: 5, name: 'Cinema Park Seoul', ar: 150000 }
+];
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-4 gap-6">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value">{m.value}</p>
+<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
+{m.change}
+</p>
+</div>
+))}
+</div>
+<div className="chart-container">
+<p className="section-label">Performance</p>
+<p className="section-title">Revenue Performance Trend</p>
+<ResponsiveContainer width="100%" height={300}>
+<LineChart data={revenueData}>
+<CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+<XAxis dataKey="month" stroke="#94a3b8" />
+<YAxis stroke="#94a3b8" />
+<Tooltip />
+<Legend />
+<Line type="monotone" dataKey="Gross Revenue" stroke="#004ac6" strokeWidth={2} />
+<Line type="monotone" dataKey="AR" stroke="#ba1a1a" strokeDasharray="5 5" strokeWidth={2} />
+</LineChart>
+</ResponsiveContainer>
+</div>
+<div className="grid grid-cols-2 gap-6">
+<div className="chart-container">
+<p className="section-label">Pipeline</p>
+<p className="section-title">Settlement Pipeline</p>
+<div className="space-y-4 mb-4">
+{pipelineData.map((p, i) => (
+<div key={i}>
+<div className="flex justify-between mb-2">
+<span className="text-sm font-medium text-slate-700">{p.name}</span>
+<span className="text-sm font-bold text-blue-600">{p.percentage}%</span>
+</div>
+<div className="progress-bar">
+<div className="progress-fill" style={{ width: `${p.percentage}%` }}></div>
+</div>
+</div>
+))}
+</div>
+<div className="bg-slate-50 rounded p-3 text-sm">
+<p className="font-semibold text-slate-900">Total Pipeline: <span className="text-blue-600">$18.4M</span></p>
+<p className="text-slate-600 text-xs mt-1">Avg Cycle: 14 Days</p>
+</div>
+</div>
+<div className="chart-container">
+<p className="section-label">Rankings</p>
+<p className="section-title">Theater AR Ranking</p>
+<div className="space-y-2">
+{theaterRanking.map((t) => (
+<div key={t.rank} className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded transition">
+<span className="text-sm font-bold text-slate-400 w-6">{t.rank}</span>
+<div className="flex-1">
+<p className="text-sm font-medium text-slate-900">{t.name}</p>
+<p className="text-xs text-slate-500">${(t.ar / 1000000).toFixed(1)}M</p>
+</div>
+</div>
+))}
+</div>
+</div>
+</div>
+<div className="chart-container">
+<div className="grid grid-cols-4 gap-4">
+<div className="text-center">
+<p className="text-3xl font-bold text-slate-900">98.4</p>
+<p className="text-xs text-slate-600 mt-1">Data Quality Score</p>
+</div>
+<div className="text-center">
+<p className="text-3xl font-bold text-slate-900">8</p>
+<p className="text-xs text-slate-600 mt-1">Active System Audits</p>
+</div>
+<div className="text-center">
+<p className="text-3xl font-bold text-slate-900">324</p>
+<p className="text-xs text-slate-600 mt-1">Processing Throughput</p>
+</div>
+<div className="text-center">
+<p className="text-3xl font-bold text-slate-900">tx/sec</p>
+<p className="text-xs text-slate-600 mt-1">&nbsp;</p>
+</div>
+</div>
+</div>
+</div>
+);
+};
+// Page: Contracts
+const ContractsMaster = () => {
+const metrics = [
+{ label: 'Total Active Contracts', value: '1,284', change: '+12%', positive: true },
+{ label: 'Avg RS Ratio', value: '45.2%', change: '+0.8%', positive: true },
+{ label: 'Settlement Volume', value: 'â©4.2B', change: '', positive: true }
+];
+const contractData = [
+{ id: 'CGV-001', theater: 'CGV ê°ë¨', rs: '50%', mg: 'â©1,200,000', status: 'ACTIVE' },
+{ id: 'LOT-002', theater: 'Lotte Cinema ìëíì', rs: '45%', mg: 'â©2,500,000', status: 'ACTIVE' },
+{ id: 'MB-003', theater: 'Megabox ì½ìì¤', rs: '42.5%', mg: 'â©3,000,000', status: 'PENDING' },
+{ id: 'CGV-004', theater: 'CGV ì ì´ ìí¸ë ì¨', rs: '48%', mg: 'â©800,000', status: 'REVIEW' }
+];
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-3 gap-6 mb-2">
+{metrics.map((m, i) => (
+<div key={i} className={`metric-card ${i === 2 ? 'bg-gradient-to-br from-blue-50 to-blue-100' : ''}`}>
+<p className="metric-label">{m.label}</p>
+<p className={`metric-value ${i === 2 ? 'text-blue-600' : ''}`}>{m.value}</p>
+{m.change && <p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>{m.change}</p>}
+</div>
+))}
+</div>
+<div className="grid grid-cols-3 gap-6">
+<div className="col-span-2">
+<div className="table-container">
+<table className="w-full">
+<thead className="table-header">
+<tr>
+<th>ID</th>
+<th>Theater</th>
+<th>RS (%)</th>
+<th>MG (KRW)</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+{contractData.map((c) => (
+<tr key={c.id} className="table-row">
+<td className="table-cell font-mono text-xs text-blue-600">{c.id}</td>
+<td className="table-cell font-medium text-slate-900">{c.theater}</td>
+<td className="table-cell text-slate-600">{c.rs}</td>
+<td className="table-cell text-slate-900 font-medium">{c.mg}</td>
+<td className="table-cell">
+<span className={`chip ${c.status === 'ACTIVE' ? 'green' : c.status === 'PENDING' ? 'yellow' : 'blue'}`}>
+{c.status}
+</span>
+</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+</div>
+<div className="col-span-1">
+<div className="chart-container p-0 overflow-hidden">
+<div className="w-full h-48 bg-gradient-to-b from-gray-800 to-gray-900"></div>
+<div className="p-4">
+<p className="section-label">Contract Detail</p>
+<p className="font-semibold text-slate-900 mt-2 text-sm">CGV ê°ë¨ Square</p>
+<div className="mt-3 space-y-2 text-xs text-slate-600">
+<div className="flex justify-between">
+<span>Theater Code</span>
+<span className="font-medium text-slate-900">CGV-001</span>
+</div>
+<div className="flex justify-between">
+<span>Status</span>
+<span className="font-medium text-green-600">Active</span>
+</div>
+<div className="flex justify-between">
+<span>RS Ratio</span>
+<span className="font-medium text-slate-900">50%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+);
+};
+// Page: Approvals
+const ApprovalCenter = () => {
+const metrics = [
+{ label: 'ì¹ì¸ ëê¸°', value: '24ê±´', change: '+12% increase', positive: true },
+{ label: 'ì¹ì¸ ìë£', value: '1,280ê±´', change: '98.2% Rate', positive: true },
+{ label: 'ì¹ì¸ ê±°ì ', value: '08ê±´', change: 'Requires review', positive: false }
+];
+const approvalItems = [
+{ id: 'APR-001', theater: 'CGV ì²­ë´ì¨ë¤ìí°', content: '10ì ìì ì ì°', amount: 'â©12,450,000', status: 'PENDING', date: '2024.03.20' },
+{ id: 'APR-002', theater: 'ë©ê°ë°ì¤ ì½ìì¤ ì¤í ì´', content: 'ì ì° ê±´', amount: 'â©8,920,000', status: 'PENDING', date: '2024.03.19' },
+{ id: 'APR-003', theater: 'ë¡¯ë°ìë¤ë§ ìëíì', content: 'ì í´ ì ì°', amount: 'â©45,100,000', status: 'APPROVED', date: '2024.03.18' },
+{ id: 'APR-004', theater: 'ìë¤ë§ íí¬', content: 'AR ë í ì ì°', amount: 'â©1,200,000', status: 'REJECTED', date: '2024.03.17' }
+];
+const [filterTab, setFilterTab] = useState('all');
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-3 gap-6">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value">{m.value}</p>
+<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
+{m.change}
+</p>
+</div>
+))}
+</div>
+<div className="chart-container">
+<div className="flex gap-4 mb-6 border-b border-slate-200">
+{['ì ì²´', 'ëê¸° ì¤', 'ìë£', 'ê±°ì ë¨'].map((tab) => (
+<button
+key={tab}
+onClick={() => setFilterTab(tab)}
+className={`pb-3 text-sm font-medium border-b-2 transition ${
+filterTab === tab
+? 'border-blue-600 text-blue-600'
+: 'border-transparent text-slate-600 hover:text-slate-900'
+}`}
+>
+{tab}
+</button>
+))}
+</div>
+<div className="space-y-3">
+{approvalItems.map((item) => (
+<div key={item.id} className="flex items-start gap-4 p-4 hover:bg-slate-50 rounded-lg border border-slate-200 transition">
+<div className="flex-1">
+<div className="flex items-center gap-2 mb-1">
+<span className="text-xs font-mono text-blue-600">{item.id}</span>
+<span className="text-xs text-slate-500">{item.date}</span>
+</div>
+<p className="font-semibold text-slate-900 text-sm">{item.theater}</p>
+<p className="text-sm text-slate-600 mt-1">{item.content}</p>
+</div>
+<div className="text-right">
+<p className="font-bold text-slate-900">{item.amount}</p>
+<span className={`chip mt-2 ${item.status === 'APPROVED' ? 'green' : item.status === 'PENDING' ? 'yellow' : 'red'}`}>
+{item.status}
+</span>
+</div>
+</div>
+))}
+</div>
+</div>
+</div>
+);
+};
+// Page: Anomalies
+const AnomalyDetection = () => {
+const metrics = [
+{ label: 'Total Anomalies', value: '1,284', change: '+12%', positive: true },
+{ label: 'Critical Alerts', value: '42', change: '', positive: true },
+{ label: 'Warnings', value: '156', change: '', positive: false },
+{ label: 'Information', value: '1,086', change: '', positive: true }
+];
+const severityData = [
+{ name: 'Critical', value: 180, fill: '#ba1a1a' },
+{ name: 'Warning', value: 300, fill: '#ca8a04' },
+{ name: 'Info', value: 720, fill: '#2563eb' }
+];
+const typeData = [
+{ name: 'AUTH', value: 280 },
+{ name: 'NETWORK', value: 350 },
+{ name: 'PAYMENT', value: 200 },
+{ name: 'USER', value: 180 },
+{ name: 'API', value: 170 }
+];
+const alertFeed = [
+{ id: 'ANM-001', timestamp: '2024.03.20 14:32', anomaly: 'Unusual settlement pattern', severity: 'Critical', entity: 'CGV Gangnam', action: 'Review' },
+{ id: 'ANM-002', timestamp: '2024.03.20 13:15', anomaly: 'Network latency spike', severity: 'Warning', entity: 'API Gateway', action: 'Monitor' },
+{ id: 'ANM-003', timestamp: '2024.03.20 12:44', anomaly: 'High transaction volume', severity: 'Info', entity: 'Settlement System', action: 'Log' }
+];
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-4 gap-6">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value">{m.value}</p>
+<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
+{m.change}
+</p>
+</div>
+))}
+</div>
+<div className="grid grid-cols-2 gap-6">
+<div className="chart-container">
+<p className="section-label">Distribution</p>
+<p className="section-title">Severity Ratio</p>
+<ResponsiveContainer width="100%" height={250}>
+<PieChart>
+<Pie
+data={severityData}
+cx="50%"
+cy="50%"
+innerRadius={60}
+outerRadius={100}
+paddingAngle={2}
+dataKey="value"
+>
+{severityData.map((entry, index) => (
+<Cell key={`cell-${index}`} fill={entry.fill} />
+))}
+</Pie>
+<Tooltip />
+</PieChart>
+</ResponsiveContainer>
+<div className="text-center mt-4">
+<p className="text-3xl font-bold text-slate-900">1.2k</p>
+<p className="text-xs text-slate-600 mt-1">Total Anomalies</p>
+</div>
+</div>
+<div className="chart-container">
+<p className="section-label">Classification</p>
+<p className="section-title">Type Distribution</p>
+<ResponsiveContainer width="100%" height={250}>
+<BarChart data={typeData}>
+<CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+<XAxis dataKey="name" stroke="#94a3b8" />
+<YAxis stroke="#94a3b8" />
+<Tooltip />
+<Bar dataKey="value" fill="#004ac6" radius={[8, 8, 0, 0]} />
+</BarChart>
+</ResponsiveContainer>
+</div>
+</div>
+<div className="table-container">
+<table className="w-full">
+<thead className="table-header">
+<tr>
+<th>Timestamp</th>
+<th>Anomaly ID</th>
+<th>Description</th>
+<th>Severity</th>
+<th>Entity</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+{alertFeed.map((alert) => (
+<tr key={alert.id} className="table-row">
+<td className="table-cell text-xs text-slate-600">{alert.timestamp}</td>
+<td className="table-cell font-mono text-xs text-blue-600">{alert.id}</td>
+<td className="table-cell text-sm text-slate-900 font-medium">{alert.anomaly}</td>
+<td className="table-cell">
+<span className={`chip ${alert.severity === 'Critical' ? 'red' : alert.severity === 'Warning' ? 'yellow' : 'blue'}`}>
+{alert.severity}
+</span>
+</td>
+<td className="table-cell text-sm text-slate-600">{alert.entity}</td>
+<td className="table-cell text-sm text-blue-600 font-medium cursor-pointer hover:underline">{alert.action}</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+</div>
+);
+};
+// Page: Theater Performance
+const TheaterPerformance = () => {
+const growthData = [
+{ theater: 'CGV ê°ë¨', growth: '+12.4%' },
+{ theater: 'ë¡¯ë°ìë¤ë§ ìëíì', growth: '+8.9%' },
+{ theater: 'ë©ê°ë°ì¤ ì½ìì¤', growth: '+5.2%' },
+{ theater: 'CGV ì©ì°ìì´íí¬ëª°', growth: '-2.1%' }
+];
+const radarData = [
+{ metric: 'Revenue', value: 85 },
+{ metric: 'Efficiency', value: 92 },
+{ metric: 'Occupancy', value: 64 },
+{ metric: 'Growth', value: 78 },
+{ metric: 'Compliance', value: 88 }
+];
+const keyPerformance = [
+{ label: 'Net Revenue', value: 'â©142,850,000' },
+{ label: 'Settlement Efficiency', value: '99.4%' },
+{ label: 'Seat Occupancy', value: '64.2%' }
+];
+const regionBreakdown = [
+{ region: 'ìì¸ ê°ë¨ê¶', percentage: 42.5 },
+{ region: 'ìì¸ ê°ìê¶', percentage: 18.2 },
+{ region: 'ê²½ê¸° ë¶ë¶', percentage: 12.1 }
+];
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-2 gap-6">
+<div className="chart-container">
+<p className="section-label">Ranking</p>
+<p className="section-title">Growth Ranking</p>
+<div className="space-y-3">
+{growthData.map((g, i) => (
+<div key={i} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded transition">
+<div>
+<p className="text-sm font-medium text-slate-900">{g.theater}</p>
+<p className="text-xs text-slate-500 mt-1">YoY Growth</p>
+</div>
+<span className={`text-sm font-bold ${g.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+{g.growth}
+</span>
+</div>
+))}
+</div>
+</div>
+<div className="chart-container">
+<p className="section-label">Analysis</p>
+<p className="section-title">Multi-Dimensional</p>
+<ResponsiveContainer width="100%" height={250}>
+<RadarChart data={radarData}>
+<PolarGrid stroke="#e2e8f0" />
+<PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
+<PolarRadiusAxis angle={90} domain={[0, 100]} />
+<Radar name="Performance" dataKey="value" stroke="#004ac6" fill="#004ac6" fillOpacity={0.6} />
+<Tooltip />
+</RadarChart>
+</ResponsiveContainer>
+</div>
+</div>
+<div className="grid grid-cols-2 gap-6">
+<div className="chart-container">
+<p className="section-label">Metrics</p>
+<p className="section-title">Key Performance</p>
+<div className="space-y-4">
+{keyPerformance.map((kp, i) => (
+<div key={i} className="flex justify-between items-center">
+<span className="text-sm text-slate-600">{kp.label}</span>
+<span className="text-lg font-bold text-slate-900">{kp.value}</span>
+</div>
+))}
+</div>
+</div>
+<div className="chart-container bg-gradient-to-br from-blue-50 to-blue-100">
+<p className="section-label text-blue-600">Market Insights</p>
+<p className="section-title text-blue-900">ì´ì ì§í</p>
+<p className="text-sm text-blue-800 mt-4">ì£¼ë§ ê´ê°ìê° ìë ëê¸° ëë¹ 15.8% ì¦ê°</p>
+</div>
+</div>
+<div className="chart-container">
+<p className="section-label">Regional</p>
+<p className="section-title">ì§ì­ë³ ë§¤ì¶ ë¹ì¤</p>
+<div className="space-y-4">
+{regionBreakdown.map((r, i) => (
+<div key={i}>
+<div className="flex justify-between mb-2">
+<span className="text-sm font-medium text-slate-700">{r.region}</span>
+<span className="text-sm font-bold text-blue-600">{r.percentage}%</span>
+</div>
+<div className="progress-bar">
+<div className="progress-fill" style={{ width: `${r.percentage}%` }}></div>
+</div>
+</div>
+))}
+</div>
+<div className="mt-4 p-3 bg-slate-50 rounded text-xs text-slate-600">
+<p className="font-semibold text-slate-900 mb-1">ë¶ì ìê³ ë¦¬ì¦ ìí</p>
+<p>Stable â¢ Deep Learning Engine v4.2 active</p>
+</div>
+</div>
+</div>
+);
+};
+// Page: Cash Flow Forecast
+const CashFlowForecast = () => {
+const metrics = [
+{ label: 'AR Balance', value: 'â©14.2B', change: '+2.4%', positive: true },
+{ label: 'Expected Recovery', value: 'â©12.8B', change: '90.1%', positive: true },
+{ label: 'Long-Term Risk', value: 'â©1.4B', change: 'Critical', positive: false },
+{ label: 'Recovery Rate', value: '88.4%', change: '-0.2%', positive: false }
+];
+const waterData = [
+{ month: 'Jan', 'Opening': 12000000, 'Inflow': 3200000, 'Outflow': -1200000, 'Closing': 14000000 },
+{ month: 'Feb', 'Opening': 14000000, 'Inflow': 2800000, 'Outflow': -1100000, 'Closing': 15700000 },
+{ month: 'Mar', 'Opening': 15700000, 'Inflow': 3400000, 'Outflow': -1300000, 'Closing': 17800000 },
+{ month: 'Apr', 'Opening': 17800000, 'Inflow': 2900000, 'Outflow': -950000, 'Closing': 19750000 },
+{ month: 'May', 'Opening': 19750000, 'Inflow': 3100000, 'Outflow': -1050000, 'Closing': 21800000 },
+{ month: 'Jun', 'Opening': 21800000, 'Inflow': 3500000, 'Outflow': -1200000, 'Closing': 24100000 }
+];
+const riskData = [
+{ risk: 'Low Risk', percentage: 72 },
+{ risk: 'Medium Risk', percentage: 19 },
+{ risk: 'High Risk', percentage: 9 }
+];
+const arAgingData = [
+{ theater: 'CGV Megaplex Seoul', amount: 'â©4,250M', riskLevel: 'SAFE' },
+{ theater: 'Lotte Cinema Busan', amount: 'â©2,120M', riskLevel: 'MODERATE' },
+{ theater: 'Megabox COEX', amount: 'â©1,890M', riskLevel: 'HIGH RISK' },
+{ theater: 'Indie Cinema Network', amount: 'â©430M', riskLevel: 'CRITICAL' }
+];
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-4 gap-6">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value">{m.value}</p>
+<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
+{m.change}
+</p>
+</div>
+))}
+</div>
+<div className="chart-container">
+<p className="section-label">Projection</p>
+<p className="section-title">Monthly Cash Flow Waterfall</p>
+<ResponsiveContainer width="100%" height={300}>
+<BarChart data={waterData}>
+<CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+<XAxis dataKey="month" stroke="#94a3b8" />
+<YAxis stroke="#94a3b8" />
+<Tooltip />
+<Legend />
+<Bar dataKey="Inflow" stackId="a" fill="#16a34a" />
+<Bar dataKey="Outflow" stackId="a" fill="#ba1a1a" />
+<Bar dataKey="Closing" fill="#004ac6" />
+</BarChart>
+</ResponsiveContainer>
+</div>
+<div className="grid grid-cols-3 gap-6">
+<div className="chart-container">
+<p className="section-label">Forecast</p>
+<p className="section-title">Recovery Projection</p>
+<div className="bg-slate-50 rounded p-4 space-y-2">
+<div className="flex justify-between">
+<span className="text-sm text-slate-600">Projected Inflow</span>
+<span className="font-bold text-slate-900">â©3.8B</span>
+</div>
+<div className="border-t border-slate-200 pt-2 mt-2">
+<div className="flex justify-between text-xs mb-1">
+<span className="text-slate-600">Within 30D</span>
+<span className="font-semibold text-slate-900">â©2.9B</span>
+</div>
+<div className="flex justify-between text-xs">
+<span className="text-slate-600">31-60D</span>
+<span className="font-semibold text-slate-900">â©0.7B</span>
+</div>
+</div>
+</div>
+</div>
+<div className="col-span-2">
+<div className="chart-container">
+<p className="section-label">Risk Distribution</p>
+<p className="section-title">Risk Analysis</p>
+<div className="space-y-3">
+{riskData.map((r, i) => (
+<div key={i}>
+<div className="flex justify-between mb-2">
+<span className="text-sm font-medium text-slate-700">{r.risk}</span>
+<span className="text-sm font-bold text-slate-900">{r.percentage}%</span>
+</div>
+<div className="progress-bar">
+<div
+className="progress-fill"
+style={{
+width: `${r.percentage}%`,
+background: r.risk === 'Low Risk' ? '#16a34a' : r.risk === 'Medium Risk' ? '#ca8a04' : '#ba1a1a'
+}}
+></div>
+</div>
+</div>
+))}
+</div>
+</div>
+</div>
+</div>
+<div className="table-container">
+<table className="w-full">
+<thead className="table-header">
+<tr>
+<th>Theater</th>
+<th>Amount</th>
+<th>Risk Level</th>
+</tr>
+</thead>
+<tbody>
+{arAgingData.map((ar) => (
+<tr key={ar.theater} className="table-row">
+<td className="table-cell text-sm font-medium text-slate-900">{ar.theater}</td>
+<td className="table-cell text-sm font-bold text-slate-900">{ar.amount}</td>
+<td className="table-cell">
+<span className={`chip ${ar.riskLevel === 'SAFE' ? 'green' : ar.riskLevel === 'MODERATE' ? 'blue' : ar.riskLevel === 'HIGH RISK' ? 'yellow' : 'red'}`}>
+{ar.riskLevel}
+</span>
+</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+</div>
+);
+};
+// Page: Data Quality
+const DataQuality = () => {
+const metrics = [
+{ label: 'Quality Score', value: '98.4', change: '+1.2%', positive: true },
+{ label: 'Completeness', value: '99.1%', change: '', positive: true },
+{ label: 'Accuracy', value: '97.8%', change: '-0.4%', positive: false },
+{ label: 'Timeliness', value: '0.8h', change: '', positive: true }
+];
+const qualityMatrix = [
+{ theater: 'CGV Gangnam', score: 98.2, status: 'OPTIMAL' },
+{ theater: 'Lotte World Tower', score: 82.5, status: 'REVIEW' },
+{ theater: 'Megabox COEX', score: 99.8, status: 'OPTIMAL' },
+{ theater: 'CGV Suwon', score: 95.1, status: 'OPTIMAL' }
+];
+const heatmapData = Array.from({ length: 7 }, (_, dayIdx) => ({
+day: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dayIdx],
+values: Array.from({ length: 7 }, () => Math.random() > 0.2 ? 'green' : 'red')
+}));
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-4 gap-6">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value">{m.value}</p>
+<p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>
+{m.change}
+</p>
+</div>
+))}
+</div>
+<div className="table-container">
+<table className="w-full">
+<thead className="table-header">
+<tr>
+<th>Theater</th>
+<th>Quality Score</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+{qualityMatrix.map((q) => (
+<tr key={q.theater} className="table-row">
+<td className="table-cell text-sm font-medium text-slate-900">{q.theater}</td>
+<td className="table-cell">
+<div className="flex items-center gap-2">
+<span className="text-sm font-bold text-slate-900">{q.score}%</span>
+<div className="progress-bar" style={{ width: '100px' }}>
+<div className="progress-fill" style={{ width: `${q.score}%` }}></div>
+</div>
+</div>
+</td>
+<td className="table-cell">
+<span className={`chip ${q.status === 'OPTIMAL' ? 'green' : 'yellow'}`}>
+{q.status}
+</span>
+</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+<div className="grid grid-cols-2 gap-6">
+<div className="chart-container">
+<p className="section-label">Heatmap</p>
+<p className="section-title">Data Gaps (7 days Ã 7 theaters)</p>
+<div className="grid gap-1">
+{heatmapData.map((row) => (
+<div key={row.day} className="flex gap-1 items-center">
+<span className="text-xs font-medium text-slate-500 w-8">{row.day}</span>
+<div className="flex gap-1 flex-1">
+{row.values.map((val, idx) => (
+<div
+key={idx}
+className="w-6 h-6 rounded text-xs flex items-center justify-center text-white font-bold"
+style={{ background: val === 'green' ? '#16a34a' : '#ba1a1a' }}
+></div>
+))}
+</div>
+</div>
+))}
+</div>
+</div>
+<div className="chart-container bg-gradient-to-br from-slate-800 to-slate-900 text-white">
+<p className="section-label text-slate-400">System</p>
+<p className="section-title text-white">Health Status</p>
+<div className="mt-4 space-y-3">
+<div className="flex items-center gap-2">
+<div className="w-2 h-2 bg-green-400 rounded-full"></div>
+<p className="text-sm">Sync engine is running optimally</p>
+</div>
+<div className="flex items-center gap-2">
+<div className="w-2 h-2 bg-green-400 rounded-full"></div>
+<p className="text-sm">All data feeds operational</p>
+</div>
+<div className="flex items-center gap-2">
+<div className="w-2 h-2 bg-green-400 rounded-full"></div>
+<p className="text-sm">Quality checks: PASSING</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+);
+};
+// Page: Journal Entries
+const JournalEntries = () => {
+const metrics = [
+{ label: 'Total Settlement Value', value: 'â©4,285,190,000', change: '+12.4%', positive: true },
+{ label: 'Balance Status', value: 'Balanced â', change: '', positive: true },
+{ label: 'Total DR', value: 'â©2,142,595,000', change: '', positive: true },
+{ label: 'Total CR', value: 'â©2,142,595,000', change: '', positive: true }
+];
+const [expandedJournal, setExpandedJournal] = useState(null);
+const journalData = [
+{
+id: 'JNL-001',
+theater: 'CGV Gangnam Square',
+amount: 'â©145,200,000',
+status: 'VERIFIED',
+details: [
+{ account: 'Cash & Equivalents 1001-01', dr: '145,200,000', cr: '' },
+{ account: 'Ticket Sales Revenue 4001-01', dr: '', cr: '120,000,000' },
+{ account: 'Concession Revenue 4002-01', dr: '', cr: '25,200,000' }
+]
+},
+{
+id: 'JNL-002',
+theater: 'Megabox COEX',
+amount: 'â©312,850,000',
+status: 'VERIFIED',
+details: []
+},
+{
+id: 'JNL-003',
+theater: 'Lotte Cinema World Tower',
+amount: 'â©289,140,000',
+status: 'VERIFIED',
+details: []
+}
+];
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-4 gap-6">
+{metrics.map((m, i) => (
+<div key={i} className="metric-card">
+<p className="metric-label">{m.label}</p>
+<p className="metric-value text-base">{m.value}</p>
+{m.change && <p className={`metric-change ${m.positive ? 'positive' : 'negative'}`}>{m.change}</p>}
+</div>
+))}
+</div>
+<div className="table-container">
+<table className="w-full">
+<thead className="table-header">
+<tr>
+<th></th>
+<th>Theater Journal Entry</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+{journalData.map((j) => (
+<React.Fragment key={j.id}>
+<tr className="table-row cursor-pointer" onClick={() => setExpandedJournal(expandedJournal === j.id ? null : j.id)}>
+<td className="table-cell text-center">
+<span className="text-xs text-slate-400">{expandedJournal === j.id ? 'â¼' : 'â¶'}</span>
+</td>
+<td className="table-cell">
+<p className="text-sm font-medium text-slate-900">{j.theater}</p>
+<p className="text-xs text-slate-500 mt-1">{j.id}</p>
+</td>
+<td className="table-cell text-sm font-bold text-slate-900">{j.amount}</td>
+<td className="table-cell">
+<span className="chip green">{j.status}</span>
+</td>
+</tr>
+{expandedJournal === j.id && j.details.length > 0 && (
+<tr className="bg-slate-50">
+<td colSpan="4" className="p-4">
+<table className="w-full text-xs">
+<thead>
+<tr className="border-b border-slate-200">
+<th className="text-left py-2 px-2 font-semibold text-slate-600">Account</th>
+<th className="text-right py-2 px-2 font-semibold text-slate-600">DR</th>
+<th className="text-right py-2 px-2 font-semibold text-slate-600">CR</th>
+</tr>
+</thead>
+<tbody>
+{j.details.map((detail, idx) => (
+<tr key={idx} className="border-b border-slate-200">
+<td className="py-2 px-2 text-slate-700">{detail.account}</td>
+<td className="text-right py-2 px-2 text-slate-900 font-medium">{detail.dr}</td>
+<td className="text-right py-2 px-2 text-slate-900 font-medium">{detail.cr}</td>
+</tr>
+))}
+</tbody>
+</table>
+</td>
+</tr>
+)}
+</React.Fragment>
+))}
+</tbody>
+</table>
+</div>
+<div className="chart-container text-center py-4">
+<p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+[PI] MECE Verified Badge
+</p>
+</div>
+</div>
+);
+};
+// Page: Settlement Detail
+const SettlementDetail = () => {
+const metrics = [
+{ label: 'Settlement Amount', value: 'â©1,428,500,000', status: 'STABLE', change: '' }
+];
+const settlementData = [
+{ item: 'Gross Revenue', amount: 'â©1,850,000,000', status: 'CONFIRMED' },
+{ item: 'VAT', amount: '-â©168,181,818', status: 'CONFIRMED' },
+{ item: 'Film Fund', amount: '-â©50,454,545', status: 'CONFIRMED' },
+{ item: 'Theater Fee', amount: '-â©815,681,818', status: 'CALCULATING' },
+{ item: 'Final Settlement', amount: 'â©1,428,500,000', status: 'VERIFIED' }
+];
+const [theaterTab, setTheaterTab] = useState('All Theaters');
+return (
+<div className="page-fade-in space-y-6">
+<div className="grid grid-cols-1 gap-6 mb-4">
+<div className="metric-card">
+<p className="metric-label">Settlement Summary</p>
+<p className="metric-value text-2xl">{metrics[0].value}</p>
+<div className="flex justify-between mt-3 text-sm">
+<span className="text-slate-600">Period: 2024.03.01-2024.03.31</span>
+<span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">{metrics[0].status}</span>
+</div>
+</div>
+</div>
+<div className="chart-container">
+<div className="flex gap-4 mb-6 border-b border-slate-200">
+{['All Theaters', 'CGV Gangnam', 'Lotte Cinema', 'Megabox'].map((tab) => (
+<button
+key={tab}
+onClick={() => setTheaterTab(tab)}
+className={`pb-3 text-sm font-medium border-b-2 transition ${
+theaterTab === tab
+? 'border-blue-600 text-blue-600'
+: 'border-transparent text-slate-600 hover:text-slate-900'
+}`}
+>
+{tab}
+</button>
+))}
+</div>
+<div className="space-y-3">
+<div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+<div className="flex items-center justify-between">
+<span className="text-sm font-medium text-blue-900">Efficiency Ratio</span>
+<span className="text-2xl font-bold text-blue-600">84.2%</span>
+</div>
+<p className="text-xs text-blue-700 mt-1">+2.4% vs. previous period</p>
+</div>
+<div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+<div className="flex items-center justify-between">
+<span className="text-sm font-medium text-amber-900">Upcoming Milestone</span>
+<span className="text-sm font-semibold text-amber-700">April 15, 2024</span>
+</div>
+<p className="text-xs text-amber-700 mt-1">Final Confirmation</p>
+</div>
+</div>
+</div>
+<div className="table-container">
+<table className="w-full">
+<thead className="table-header">
+<tr>
+<th>Step</th>
+<th>Item</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+{settlementData.map((s, i) => (
+<tr key={i} className="table-row">
+<td className="table-cell text-xs font-mono text-slate-500">{String(i + 1).padStart(2, '0')}</td>
+<td className="table-cell text-sm font-medium text-slate-900">{s.item}</td>
+<td className="table-cell text-sm font-bold text-slate-900">{s.amount}</td>
+<td className="table-cell">
+<span className={`chip ${s.status === 'VERIFIED' || s.status === 'CONFIRMED' ? 'green' : 'yellow'}`}>
+{s.status}
+</span>
+</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+<div className="flex gap-4 justify-end">
+<button className="px-6 py-2 text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition">
+Previous Period
+</button>
+<button className="px-6 py-2 text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition">
+Audit Logs
+</button>
+<button className="px-6 py-2 text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition">
+Save Draft
+</button>
+<button className="gradient-button px-6 py-2">
+Confirm & Dispatch
+</button>
+</div>
+</div>
+);
+};
+// Main App Component
+const App = () => {
+const [currentPage, setCurrentPage] = useState('home');
+const pageMap = {
+'home': <CEOInsightBoard />,
+'operations': <OperationsDashboard />,
+'contracts': <ContractsMaster />,
+'approvals': <ApprovalCenter />,
+'anomalies': <AnomalyDetection />,
+'theater': <TheaterPerformance />,
+'cashflow': <CashFlowForecast />,
+'quality': <DataQuality />,
+'journal': <JournalEntries />,
+'settlement': <SettlementDetail />
+};
+useEffect(() => {
+const handleHashChange = () => {
+const hash = window.location.hash.slice(1) || 'home';
+setCurrentPage(hash);
+};
+window.addEventListener('hashchange', handleHashChange);
+handleHashChange();
+return () => window.removeEventListener('hashchange', handleHashChange);
+}, []);
+return (
+<div className="flex h-screen bg-slate-50">
+<Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+<div className="flex-1 flex flex-col">
+<Header currentPage={currentPage} />
+<main className="flex-1 overflow-auto pt-20 px-8 pb-8">
+{pageMap[currentPage] || pageMap['home']}
+</main>
+</div>
+</div>
+);
+};
+ReactDOM.render(<App />, document.getElementById('app'));
+</script>
+</body>
+</html>
