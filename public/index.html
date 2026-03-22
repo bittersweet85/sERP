@@ -395,14 +395,14 @@ const pageLabels = {
 const pageTitles = {
 'home': 'CEO Insight Board',
 'operations': 'Operations Dashboard',
-'contracts': 'ê³ì½ ë§ì¤í°',
-'approvals': 'ì¹ì¸ ì¼í°',
-'anomalies': 'ì´ì ì§í íì§',
-'theater': 'ê·¹ì¥ ì±ê³¼ ë¶ì',
-'cashflow': 'íê¸íë¦ ìì¸¡',
-'quality': 'ë°ì´í° íì§ ëª¨ëí°',
-'journal': 'ë¶ê° ì í',
-'settlement': 'ì ì° ë¨ê³ë³ ìì¸'
+'contracts': '계약 마스터',
+'approvals': '승인 센터',
+'anomalies': '이상 집후 탐지',
+'theater': '극장 성과 분석',
+'cashflow': '현금흐름 예측',
+'quality': '데이터 품질 모니터',
+'journal': '분개 전표',
+'settlement': '정산 단계별 상세'
 };
 return (
 <div className="fixed top-0 right-0 left-64 h-16 glass-header border-b border-slate-200 flex items-center justify-between px-8 z-40">
@@ -493,10 +493,10 @@ Logout
 // Page: CEO Insight Board
 const CEOInsightBoard = () => {
 const metrics = [
-{ label: 'Total AR', value: 'â©89,621,293', change: '+12.3%', positive: true },
-{ label: 'Gross Revenue', value: 'â©79,280,000', change: '+8.7%', positive: true },
-{ label: 'ì´ì ì§í', value: '17ê±´', change: '-2ê±´', positive: true },
-{ label: 'ë¦¬ì¤í¬ ì ì', value: '72/100', change: '-3pts', positive: true }
+{ label: 'Total AR', value: '₩89,621,293', change: '+12.3%', positive: true },
+{ label: 'Gross Revenue', value: '₩79,280,000', change: '+8.7%', positive: true },
+{ label: '이상 징후', value: '17건', change: '-2건', positive: true },
+{ label: '리스크 점수', value: '72/100', change: '-3pts', positive: true }
 ];
 const regionData = [
 { name: 'Seoul Metropolitan', percentage: 82 },
@@ -568,19 +568,19 @@ return (
 <div className="space-y-3">
 <div className="insight-card blue">
 <p className="insight-title">Projects</p>
-<p className="insight-content">ê°ë¨ ì§ì­ ì´ì ì§í ê°ì§ë¨</p>
+<p className="insight-content">강남 지역 이상 직후 감지됨</p>
 </div>
 <div className="insight-card green">
 <p className="insight-title">Areas</p>
-<p className="insight-content">íê¸ ì ì° ë¹ì¤ ê°ì ì¶ì¸</p>
+<p className="insight-content">현금 정산 비중 감소 추세</p>
 </div>
 <div className="insight-card yellow">
 <p className="insight-title">Resources</p>
-<p className="insight-content">ìë°ì´í¸ë ì¸ë¬´ ì§ì¹¨ì</p>
+<p className="insight-content">업데이트된 세무 지침서</p>
 </div>
 <div className="insight-card gray">
 <p className="insight-title">Archives</p>
-<p className="insight-content">2022ë Q3 ê²°ì° ë°ì´í° ì´ê´</p>
+<p className="insight-content">2022년 Q3 결산 데이터 이관</p>
 </div>
 </div>
 </div>
@@ -712,13 +712,13 @@ const ContractsMaster = () => {
 const metrics = [
 { label: 'Total Active Contracts', value: '1,284', change: '+12%', positive: true },
 { label: 'Avg RS Ratio', value: '45.2%', change: '+0.8%', positive: true },
-{ label: 'Settlement Volume', value: 'â©4.2B', change: '', positive: true }
+{ label: 'Settlement Volume', value: '₩4.2B', change: '', positive: true }
 ];
 const contractData = [
-{ id: 'CGV-001', theater: 'CGV ê°ë¨', rs: '50%', mg: 'â©1,200,000', status: 'ACTIVE' },
-{ id: 'LOT-002', theater: 'Lotte Cinema ìëíì', rs: '45%', mg: 'â©2,500,000', status: 'ACTIVE' },
-{ id: 'MB-003', theater: 'Megabox ì½ìì¤', rs: '42.5%', mg: 'â©3,000,000', status: 'PENDING' },
-{ id: 'CGV-004', theater: 'CGV ì ì´ ìí¸ë ì¨', rs: '48%', mg: 'â©800,000', status: 'REVIEW' }
+{ id: 'CGV-001', theater: 'CGV 강남', rs: '50%', mg: '₩1,200,000', status: 'ACTIVE' },
+{ id: 'LOT-002', theater: 'Lotte Cinema 월드타워', rs: '45%', mg: '₩2,500,000', status: 'ACTIVE' },
+{ id: 'MB-003', theater: 'Megabox 코엑스', rs: '42.5%', mg: '₩3,000,000', status: 'PENDING' },
+{ id: 'CGV-004', theater: 'CGV 신촌 아트레온', rs: '48%', mg: '₩800,000', status: 'REVIEW' }
 ];
 return (
 <div className="page-fade-in space-y-6">
@@ -767,7 +767,7 @@ return (
 <div className="w-full h-48 bg-gradient-to-b from-gray-800 to-gray-900"></div>
 <div className="p-4">
 <p className="section-label">Contract Detail</p>
-<p className="font-semibold text-slate-900 mt-2 text-sm">CGV ê°ë¨ Square</p>
+<p className="font-semibold text-slate-900 mt-2 text-sm">CGV 강남 Square</p>
 <div className="mt-3 space-y-2 text-xs text-slate-600">
 <div className="flex justify-between">
 <span>Theater Code</span>
@@ -792,15 +792,15 @@ return (
 // Page: Approvals
 const ApprovalCenter = () => {
 const metrics = [
-{ label: 'ì¹ì¸ ëê¸°', value: '24ê±´', change: '+12% increase', positive: true },
-{ label: 'ì¹ì¸ ìë£', value: '1,280ê±´', change: '98.2% Rate', positive: true },
-{ label: 'ì¹ì¸ ê±°ì ', value: '08ê±´', change: 'Requires review', positive: false }
+{ label: '승인 대기', value: '24건', change: '+12% increase', positive: true },
+{ label: '승인 완료', value: '1,280건', change: '98.2% Rate', positive: true },
+{ label: '승인 거절', value: '08건', change: 'Requires review', positive: false }
 ];
 const approvalItems = [
-{ id: 'APR-001', theater: 'CGV ì²­ë´ì¨ë¤ìí°', content: '10ì ìì ì ì°', amount: 'â©12,450,000', status: 'PENDING', date: '2024.03.20' },
-{ id: 'APR-002', theater: 'ë©ê°ë°ì¤ ì½ìì¤ ì¤í ì´', content: 'ì ì° ê±´', amount: 'â©8,920,000', status: 'PENDING', date: '2024.03.19' },
-{ id: 'APR-003', theater: 'ë¡¯ë°ìë¤ë§ ìëíì', content: 'ì í´ ì ì°', amount: 'â©45,100,000', status: 'APPROVED', date: '2024.03.18' },
-{ id: 'APR-004', theater: 'ìë¤ë§ íí¬', content: 'AR ë í ì ì°', amount: 'â©1,200,000', status: 'REJECTED', date: '2024.03.17' }
+{ id: 'APR-001', theater: 'CGV 청담씤너시티', content: '10월 상영 정산', amount: '₩12,450,000', status: 'PENDING', date: '2024.03.20' },
+{ id: 'APR-002', theater: '메가박스 코엑스 스토어', content: '정산 건', amount: '₩8,920,000', status: 'PENDING', date: '2024.03.19' },
+{ id: 'APR-003', theater: '롯데시네마 월드타워', content: '제휴 정산', amount: '₩45,100,000', status: 'APPROVED', date: '2024.03.18' },
+{ id: 'APR-004', theater: '시네마 파크', content: 'AR 렌퓰 정산', amount: '₩1,200,000', status: 'REJECTED', date: '2024.03.17' }
 ];
 const [filterTab, setFilterTab] = useState('all');
 return (
@@ -818,7 +818,7 @@ return (
 </div>
 <div className="chart-container">
 <div className="flex gap-4 mb-6 border-b border-slate-200">
-{['ì ì²´', 'ëê¸° ì¤', 'ìë£', 'ê±°ì ë¨'].map((tab) => (
+{['전체', '대기 중', '완료', '거절됨'].map((tab) => (
 <button
 key={tab}
 onClick={() => setFilterTab(tab)}
@@ -971,10 +971,10 @@ dataKey="value"
 // Page: Theater Performance
 const TheaterPerformance = () => {
 const growthData = [
-{ theater: 'CGV ê°ë¨', growth: '+12.4%' },
-{ theater: 'ë¡¯ë°ìë¤ë§ ìëíì', growth: '+8.9%' },
-{ theater: 'ë©ê°ë°ì¤ ì½ìì¤', growth: '+5.2%' },
-{ theater: 'CGV ì©ì°ìì´íí¬ëª°', growth: '-2.1%' }
+{ theater: 'CGV 강남', growth: '+12.4%' },
+{ theater: '롯데시네마 월드타워', growth: '+8.9%' },
+{ theater: '메가박스 코엑스', growth: '+5.2%' },
+{ theater: 'CGV 용산아이팈크몰', growth: '-2.1%' }
 ];
 const radarData = [
 { metric: 'Revenue', value: 85 },
@@ -984,14 +984,14 @@ const radarData = [
 { metric: 'Compliance', value: 88 }
 ];
 const keyPerformance = [
-{ label: 'Net Revenue', value: 'â©142,850,000' },
+{ label: 'Net Revenue', value: '₩142,850,000' },
 { label: 'Settlement Efficiency', value: '99.4%' },
 { label: 'Seat Occupancy', value: '64.2%' }
 ];
 const regionBreakdown = [
-{ region: 'ìì¸ ê°ë¨ê¶', percentage: 42.5 },
-{ region: 'ìì¸ ê°ìê¶', percentage: 18.2 },
-{ region: 'ê²½ê¸° ë¶ë¶', percentage: 12.1 }
+{ region: '서울 강남권', percentage: 42.5 },
+{ region: '서울 강서권', percentage: 18.2 },
+{ region: '경기 북부', percentage: 12.1 }
 ];
 return (
 <div className="page-fade-in space-y-6">
@@ -1042,13 +1042,13 @@ return (
 </div>
 <div className="chart-container bg-gradient-to-br from-blue-50 to-blue-100">
 <p className="section-label text-blue-600">Market Insights</p>
-<p className="section-title text-blue-900">ì´ì ì§í</p>
-<p className="text-sm text-blue-800 mt-4">ì£¼ë§ ê´ê°ìê° ìë ëê¸° ëë¹ 15.8% ì¦ê°</p>
+<p className="section-title text-blue-900">이상 직후</p>
+<p className="text-sm text-blue-800 mt-4">주말 관객수가 작년 동기 대비 15.8% 증가</p>
 </div>
 </div>
 <div className="chart-container">
 <p className="section-label">Regional</p>
-<p className="section-title">ì§ì­ë³ ë§¤ì¶ ë¹ì¤</p>
+<p className="section-title">지역별 매출 비중</p>
 <div className="space-y-4">
 {regionBreakdown.map((r, i) => (
 <div key={i}>
@@ -1063,8 +1063,8 @@ return (
 ))}
 </div>
 <div className="mt-4 p-3 bg-slate-50 rounded text-xs text-slate-600">
-<p className="font-semibold text-slate-900 mb-1">ë¶ì ìê³ ë¦¬ì¦ ìí</p>
-<p>Stable â¢ Deep Learning Engine v4.2 active</p>
+<p className="font-semibold text-slate-900 mb-1">분석 알고리즘 상태</p>
+<p>Stable • Deep Learning Engine v4.2 active</p>
 </div>
 </div>
 </div>
@@ -1073,9 +1073,9 @@ return (
 // Page: Cash Flow Forecast
 const CashFlowForecast = () => {
 const metrics = [
-{ label: 'AR Balance', value: 'â©14.2B', change: '+2.4%', positive: true },
-{ label: 'Expected Recovery', value: 'â©12.8B', change: '90.1%', positive: true },
-{ label: 'Long-Term Risk', value: 'â©1.4B', change: 'Critical', positive: false },
+{ label: 'AR Balance', value: '₩14.2B', change: '+2.4%', positive: true },
+{ label: 'Expected Recovery', value: '₩12.8B', change: '90.1%', positive: true },
+{ label: 'Long-Term Risk', value: '₩1.4B', change: 'Critical', positive: false },
 { label: 'Recovery Rate', value: '88.4%', change: '-0.2%', positive: false }
 ];
 const waterData = [
@@ -1092,10 +1092,10 @@ const riskData = [
 { risk: 'High Risk', percentage: 9 }
 ];
 const arAgingData = [
-{ theater: 'CGV Megaplex Seoul', amount: 'â©4,250M', riskLevel: 'SAFE' },
-{ theater: 'Lotte Cinema Busan', amount: 'â©2,120M', riskLevel: 'MODERATE' },
-{ theater: 'Megabox COEX', amount: 'â©1,890M', riskLevel: 'HIGH RISK' },
-{ theater: 'Indie Cinema Network', amount: 'â©430M', riskLevel: 'CRITICAL' }
+{ theater: 'CGV Megaplex Seoul', amount: '₩4,250M', riskLevel: 'SAFE' },
+{ theater: 'Lotte Cinema Busan', amount: '₩2,120M', riskLevel: 'MODERATE' },
+{ theater: 'Megabox COEX', amount: '₩1,890M', riskLevel: 'HIGH RISK' },
+{ theater: 'Indie Cinema Network', amount: '₩430M', riskLevel: 'CRITICAL' }
 ];
 return (
 <div className="page-fade-in space-y-6">
@@ -1133,16 +1133,16 @@ return (
 <div className="bg-slate-50 rounded p-4 space-y-2">
 <div className="flex justify-between">
 <span className="text-sm text-slate-600">Projected Inflow</span>
-<span className="font-bold text-slate-900">â©3.8B</span>
+<span className="font-bold text-slate-900">₩3.8B</span>
 </div>
 <div className="border-t border-slate-200 pt-2 mt-2">
 <div className="flex justify-between text-xs mb-1">
 <span className="text-slate-600">Within 30D</span>
-<span className="font-semibold text-slate-900">â©2.9B</span>
+<span className="font-semibold text-slate-900">₩2.9B</span>
 </div>
 <div className="flex justify-between text-xs">
 <span className="text-slate-600">31-60D</span>
-<span className="font-semibold text-slate-900">â©0.7B</span>
+<span className="font-semibold text-slate-900">₩0.7B</span>
 </div>
 </div>
 </div>
@@ -1265,7 +1265,7 @@ return (
 <div className="grid grid-cols-2 gap-6">
 <div className="chart-container">
 <p className="section-label">Heatmap</p>
-<p className="section-title">Data Gaps (7 days Ã 7 theaters)</p>
+<p className="section-title">Data Gaps (7 days × 7 theaters)</p>
 <div className="grid gap-1">
 {heatmapData.map((row) => (
 <div key={row.day} className="flex gap-1 items-center">
@@ -1308,17 +1308,17 @@ style={{ background: val === 'green' ? '#16a34a' : '#ba1a1a' }}
 // Page: Journal Entries
 const JournalEntries = () => {
 const metrics = [
-{ label: 'Total Settlement Value', value: 'â©4,285,190,000', change: '+12.4%', positive: true },
-{ label: 'Balance Status', value: 'Balanced â', change: '', positive: true },
-{ label: 'Total DR', value: 'â©2,142,595,000', change: '', positive: true },
-{ label: 'Total CR', value: 'â©2,142,595,000', change: '', positive: true }
+{ label: 'Total Settlement Value', value: '₩4,285,190,000', change: '+12.4%', positive: true },
+{ label: 'Balance Status', value: 'Balanced ✓', change: '', positive: true },
+{ label: 'Total DR', value: '₩2,142,595,000', change: '', positive: true },
+{ label: 'Total CR', value: '₩2,142,595,000', change: '', positive: true }
 ];
 const [expandedJournal, setExpandedJournal] = useState(null);
 const journalData = [
 {
 id: 'JNL-001',
 theater: 'CGV Gangnam Square',
-amount: 'â©145,200,000',
+amount: '₩145,200,000',
 status: 'VERIFIED',
 details: [
 { account: 'Cash & Equivalents 1001-01', dr: '145,200,000', cr: '' },
@@ -1329,14 +1329,14 @@ details: [
 {
 id: 'JNL-002',
 theater: 'Megabox COEX',
-amount: 'â©312,850,000',
+amount: '₩312,850,000',
 status: 'VERIFIED',
 details: []
 },
 {
 id: 'JNL-003',
 theater: 'Lotte Cinema World Tower',
-amount: 'â©289,140,000',
+amount: '₩289,140,000',
 status: 'VERIFIED',
 details: []
 }
@@ -1367,7 +1367,7 @@ return (
 <React.Fragment key={j.id}>
 <tr className="table-row cursor-pointer" onClick={() => setExpandedJournal(expandedJournal === j.id ? null : j.id)}>
 <td className="table-cell text-center">
-<span className="text-xs text-slate-400">{expandedJournal === j.id ? 'â¼' : 'â¶'}</span>
+<span className="text-xs text-slate-400">{expandedJournal === j.id ? '▼' : '▶'}</span>
 </td>
 <td className="table-cell">
 <p className="text-sm font-medium text-slate-900">{j.theater}</p>
@@ -1418,14 +1418,14 @@ return (
 // Page: Settlement Detail
 const SettlementDetail = () => {
 const metrics = [
-{ label: 'Settlement Amount', value: 'â©1,428,500,000', status: 'STABLE', change: '' }
+{ label: 'Settlement Amount', value: '₩1,428,500,000', status: 'STABLE', change: '' }
 ];
 const settlementData = [
-{ item: 'Gross Revenue', amount: 'â©1,850,000,000', status: 'CONFIRMED' },
-{ item: 'VAT', amount: '-â©168,181,818', status: 'CONFIRMED' },
-{ item: 'Film Fund', amount: '-â©50,454,545', status: 'CONFIRMED' },
-{ item: 'Theater Fee', amount: '-â©815,681,818', status: 'CALCULATING' },
-{ item: 'Final Settlement', amount: 'â©1,428,500,000', status: 'VERIFIED' }
+{ item: 'Gross Revenue', amount: '₩1,850,000,000', status: 'CONFIRMED' },
+{ item: 'VAT', amount: '-₩168,181,818', status: 'CONFIRMED' },
+{ item: 'Film Fund', amount: '-₩50,454,545', status: 'CONFIRMED' },
+{ item: 'Theater Fee', amount: '-₩815,681,818', status: 'CALCULATING' },
+{ item: 'Final Settlement', amount: '₩1,428,500,000', status: 'VERIFIED' }
 ];
 const [theaterTab, setTheaterTab] = useState('All Theaters');
 return (
