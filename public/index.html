@@ -1532,16 +1532,16 @@ setUploadedFiles([
 
 const handleDragOver = (e) => {
 e.preventDefault();
-dropZoneRef.current?.classList.add('dragover');
+if (dropZoneRef.current) dropZoneRef.current.classList.add('dragover');
 };
 
 const handleDragLeave = () => {
-dropZoneRef.current?.classList.remove('dragover');
+if (dropZoneRef.current) dropZoneRef.current.classList.remove('dragover');
 };
 
 const handleDrop = (e) => {
 e.preventDefault();
-dropZoneRef.current?.classList.remove('dragover');
+if (dropZoneRef.current) dropZoneRef.current.classList.remove('dragover');
 handleFiles(e.dataTransfer.files);
 };
 
