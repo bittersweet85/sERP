@@ -1654,7 +1654,7 @@ className="w-full px-4 py-2 border-2 border-blue-400 text-blue-600 rounded-lg fo
 샘플 데이터 생성
 </button>
 
-{uploadedFiles.length > 0 && (
+{uploadedFiles.length >= 1 && (
 <div className="file-list">
 <p className="font-semibold text-slate-900 mb-3">업로드된 파일 ({uploadedFiles.length})</p>
 {uploadedFiles.map((file, idx) => (
@@ -1756,7 +1756,7 @@ style={cleaningRules.duplicateRemoval ? {backgroundColor: '#006243'} : {}}
 <p className="rule-name">중복 행 제거</p>
 <p className="rule-description">날짜+극장+영화 조합으로 중복 감지</p>
 </div>
-<p className="rule-count">{Math.max(0, rawData.length - new Set(rawData.map(r => `${r.date}|${r.theater}|${r.movie}`)).size)} 행</p>
+<p className="rule-count">{Math.max(0, rawData.length - new Set(rawData.map(function(r) { return r.date + '|' + r.theater + '|' + r.movie; })).size)} 행</p>
 </label>
 
 <label className="cleaning-rule cursor-pointer">
@@ -1794,7 +1794,7 @@ style={cleaningRules.anomalyDetection ? {backgroundColor: '#006243'} : {}}
 <p className="rule-name">이상치 탐지</p>
 <p className="rule-description">음수 매출, 50,000명 이상 관객, 빈 값 플래그</p>
 </div>
-<p className="rule-count">{rawData.filter(r => r.revenue < 0 || r.audience > 50000 || !r.date).length} 행</p>
+<p className="rule-count">{rawData.filter(function(r) { return r.revenue < 0 || r.audience > 50000 || !r.date; }).length} 행</p>
 </label>
 
 <label className="cleaning-rule cursor-pointer">
@@ -1851,15 +1851,15 @@ className="gradient-button px-6 py-2"
 </div>
 <div className="summary-stat">
 <p className="summary-stat-label">정제된 행</p>
-<p className="summary-stat-value">{cleanedData.filter(r => !r._flagged).length}</p>
+<p className="summary-stat-value">{cleanedData.filter(function(r) { return !r._flagged; }).length}</p>
 </div>
 <div className="summary-stat">
 <p className="summary-stat-label">플래그된 행</p>
-<p className="summary-stat-value">{cleanedData.filter(r => r._flagged).length}</p>
+<p className="summary-stat-value">{cleanedData.filter(function(r) { return r._flagged; }).length}</p>
 </div>
 <div className="summary-stat">
 <p className="summary-stat-label">정제율</p>
-<p className="summary-stat-value">{((cleanedData.filter(r => !r._flagged).length / rawData.length) * 100).toFixed(1)}%</p>
+<p className="summary-stat-value">{((cleanedData.filter(function(r) { return !r._flagged; }).length / rawData.length) * 100).toFixed(1)}%</p>
 </div>
 </div>
 
@@ -1903,7 +1903,7 @@ className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medi
 </button>
 <button
 onClick={() => {
-const ws = window.XLSX.utils.json_to_sheet(cleanedData.filter(r => !r._flagged));
+const ws = window.XLSX.utils.json_to_sheet(cleanedData.filter(function(r) { return !r._flagged; }));
 const wb = window.XLSX.utils.book_new();
 window.XLSX.utils.book_append_sheet(wb, ws, 'Cleaned Data');
 window.XLSX.writeFile(wb, 'cleaned_data.xlsx');
@@ -1933,7 +1933,7 @@ className="gradient-button px-6 py-2"
 <IconCheckCircle className="w-16 h-16 mx-auto text-green-600 mb-4" />
 <p className="text-lg font-bold text-green-900">정제 완료</p>
 <p className="text-sm text-green-700 mt-2">
-{cleanedData.filter(r => !r._flagged).length}개의 정제된 행이 대시보드에 반영될 준비가 완료되었습니다.
+{cleanedData.filter(function(r) { return !r._flagged; }).length}개의 정제된 행이 대시보드에 반영될 준비가 완료되었습니다.
 </p>
 </div>
 
@@ -1946,15 +1946,15 @@ className="gradient-button px-6 py-2"
 </div>
 <div className="flex justify-between border-t pt-3">
 <span className="text-slate-600">정제된 데이터</span>
-<span className="font-medium text-slate-900">{cleanedData.filter(r => !r._flagged).length}개 행</span>
+<span className="font-medium text-slate-900">{cleanedData.filter(function(r) { return !r._flagged; }).length}개 행</span>
 </div>
 <div className="flex justify-between">
 <span className="text-slate-600">플래그된 이상치</span>
-<span className="font-medium text-slate-900">{cleanedData.filter(r => r._flagged).length}개 행</span>
+<span className="font-medium text-slate-900">{cleanedData.filter(function(r) { return r._flagged; }).length}개 행</span>
 </div>
 <div className="flex justify-between border-t pt-3">
 <span className="text-slate-600">정제율</span>
-<span className="font-medium text-green-600">{((cleanedData.filter(r => !r._flagged).length / rawData.length) * 100).toFixed(1)}%</span>
+<span className="font-medium text-green-600">{((cleanedData.filter(function(r) { return !r._flagged; }).length / rawData.length) * 100).toFixed(1)}%</span>
 </div>
 </div>
 </div>
@@ -1969,7 +1969,7 @@ className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medi
 <button
 onClick={() => {
 setSuccess(true);
-onApplyData(cleanedData.filter(r => !r._flagged));
+onApplyData(cleanedData.filter(function(r) { return !r._flagged; }));
 setTimeout(() => {
 setCurrentStep(1);
 setUploadedFiles([]);
